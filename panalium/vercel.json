@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://<tu-backend>.onrender.com/api/:path*" }
+    { "source": "/api/:path*", "destination": "https://panalium-api.onrender.com/api/:path*" }
   ]
 }
