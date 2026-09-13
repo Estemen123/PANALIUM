@@ -4,7 +4,6 @@ import {
   Card,
   EmptyState,
   FilterChips,
-  InfoBanner,
   Page,
   PageHeader,
   useToast,
@@ -80,11 +79,6 @@ export default function NFTMarketplacePage() {
           </>
         }
       />
-
-      <InfoBanner title="Registro web2." className="mb-5">
-        Cada compra u oferta aceptada cambia el dueño de la Hexakey en la colmena (Firestore). On-chain todas
-        siguen en custodia de la wallet master.
-      </InfoBanner>
 
       {error && (
         <p className="text-xs font-semibold text-brown bg-honey-light rounded-lg px-3 py-2 mb-4" role="alert">
