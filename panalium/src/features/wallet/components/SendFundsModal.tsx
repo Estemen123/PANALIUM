@@ -7,14 +7,14 @@ export default function SendFundsModal({ onClose }: { onClose: () => void }) {
   const { form, bind, setField } = useFormState({
     to: "",
     amount: "",
-    currency: "USDT" as Currency,
+    currency: "USDC" as Currency,
   })
 
   return (
     <Modal
       onClose={onClose}
-      title="Enviar USDT"
-      description="Transfiere USDT o tokens BS a otra Abeja de la colmena."
+      title="Enviar USDC"
+      description="Transfiere USDC o tokens BS a otra Abeja de la colmena."
     >
       <div className="flex flex-col gap-4">
         <Input

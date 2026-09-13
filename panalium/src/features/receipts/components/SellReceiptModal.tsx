@@ -20,7 +20,7 @@ export default function SellReceiptModal({
   const { form, bind, setField } = useFormState({
     amount: "1",
     price: "",
-    currency: "USDT" as Currency,
+    currency: "USDC" as Currency,
   })
   const amount = toInt(form.amount, 0)
   const price = toFloat(form.price, 0)

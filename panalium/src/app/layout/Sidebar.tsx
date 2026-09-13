@@ -30,11 +30,11 @@ export default function Sidebar({
   const items = NAV_BY_ROLE[user.role]
 
   // Mismo criterio que la tarjeta de Mi Colmena: sin ERC-20 configurado se muestra el nativo.
-  const symbol = chain?.token?.symbol ?? chain?.nativeCurrency.symbol ?? "USDT"
+  const symbol = chain?.token?.symbol ?? chain?.nativeCurrency.symbol ?? "USDC"
   const balance =
     tokenBalance?.formatted ??
     (chain?.token
-      ? formatPrice(user.wallet.usdt, "USDT")
+      ? formatPrice(user.wallet.usdc, "USDC")
       : (account?.balance.avax ?? "0"))
 
   return (

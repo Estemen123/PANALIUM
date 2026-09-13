@@ -15,7 +15,7 @@ export const MOCK_LISTINGS: NFTListing[] = [
     sellerName: "Carlos Mendoza",
     amount: 15,
     askPrice: 9.5,
-    askCurrency: "USDT",
+    askCurrency: "USDC",
     listingStatus: "active",
     createdAt: "2026-09-09",
     supplierETA: "2026-10-24",

@@ -9,7 +9,7 @@ export function createUser(input: RegisterUserInput): User {
     email: input.email,
     phone: input.phone,
     role: input.role,
-    wallet: { usdt: 0, bs: 0, address: generateWalletAddress() },
+    wallet: { usdc: 0, bs: 0, address: generateWalletAddress() },
     createdAt: today(),
     verified: false,
   }

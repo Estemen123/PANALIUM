@@ -10,7 +10,7 @@ export interface NavItem {
 
 const BUYER_NAV: NavItem[] = [
   { id: "dashboard", label: "Mi Colmena" },
-  { id: "wallet", label: "Reserva de USDT" },
+  { id: "wallet", label: "Reserva de USDC" },
   { id: "marketplace-groups", label: "Panales" },
   { id: "my-groups", label: "Mis Panales", nested: true },
   { id: "create-group", label: "Fundar un Panal", nested: true },
@@ -22,7 +22,7 @@ const BUYER_NAV: NavItem[] = [
 
 const WHOLESALER_NAV: NavItem[] = [
   { id: "dashboard", label: "Mi Colmena" },
-  { id: "wallet", label: "Reserva de USDT" },
+  { id: "wallet", label: "Reserva de USDC" },
   { id: "wholesaler-products", label: "Mis productos" },
   { id: "wholesaler-add-product", label: "Publicar producto", nested: true },
   { id: "marketplace-groups", label: "Panales de Abejas" },

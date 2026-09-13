@@ -33,13 +33,13 @@ export default function NFTMarketplacePage() {
 
   const filters: MarketFilterOption[] = [
     { value: "all", label: `Todas las ofertas · ${listings.length}` },
-    { value: "honey", label: "Solo en USDT" },
+    { value: "honey", label: "Solo en USDC" },
     { value: "mine", label: "Mis ofertas" },
   ]
 
   const visible = useMemo(() => {
     if (filter === "honey")
-      return listings.filter((l) => l.askCurrency === "USDT")
+      return listings.filter((l) => l.askCurrency === "USDC")
     if (filter === "mine") return listings.filter((l) => l.sellerId === user.id)
     return listings
   }, [listings, filter, user.id])

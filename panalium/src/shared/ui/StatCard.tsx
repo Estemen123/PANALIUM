@@ -5,7 +5,7 @@ export interface StatCardProps {
   label: string
   value: ReactNode
   sub?: string
-  /** Sufijo pequeño junto al valor (p. ej. "USDT"). */
+  /** Sufijo pequeño junto al valor (p. ej. "USDC"). */
   unit?: string
 }
 

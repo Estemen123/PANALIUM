@@ -19,7 +19,7 @@ export default function UserRow({ user }: { user: User }) {
       <div className="text-right shrink-0">
         <RolePill role={user.role} />
         <p className="mono text-xs text-muted-foreground mt-1">
-          {formatPrice(user.wallet.usdt, "USDT", 0)} USDT
+          {formatPrice(user.wallet.usdc, "USDC", 0)} USDC
         </p>
       </div>
       <div className="flex gap-2 shrink-0">

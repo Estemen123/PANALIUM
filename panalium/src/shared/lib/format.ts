@@ -3,7 +3,7 @@ import type { Currency } from "@/domain/common/types"
 const LOCALE = "es-VE"
 
 function decimalsFor(currency: Currency): number {
-  return currency === "USDT" ? 2 : 0
+  return currency === "USDC" ? 2 : 0
 }
 
 /** Solo la cifra: `4,50` / `88.000` */
@@ -19,7 +19,7 @@ export function formatPrice(
   })
 }
 
-/** Cifra con unidad: `4,50 USDT` / `88.000 BS` */
+/** Cifra con unidad: `4,50 USDC` / `88.000 BS` */
 export function formatAmount(
   value: number,
   currency: Currency,
@@ -28,9 +28,9 @@ export function formatAmount(
   return `${formatPrice(value, currency, fractionDigits)} ${currency}`
 }
 
-/** Atajo para USDT: `2.450,00 USDT` */
-export function formatUsdt(value: number): string {
-  return formatAmount(value, "USDT")
+/** Atajo para USDC: `2.450,00 USDC` */
+export function formatUsdc(value: number): string {
+  return formatAmount(value, "USDC")
 }
 
 /** Dirección abreviada: `0x3a4b5c6d…1a2b` */

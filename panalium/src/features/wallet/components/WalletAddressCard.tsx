@@ -20,7 +20,7 @@ export default function WalletAddressCard({ address }: { address: string }) {
       </div>
       {copied && (
         <p className="text-xs text-olive font-semibold mt-1">
-          Dirección copiada. Compártela con quien quiera enviarte USDT.
+          Dirección copiada. Compártela con quien quiera enviarte USDC.
         </p>
       )}
     </Card>

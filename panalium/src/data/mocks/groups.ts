@@ -8,7 +8,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
     creatorName: "Carlos Mendoza",
     productName: "Aceite de Oliva Extra Virgen 1L",
     description:
-      "Compramos juntos aceite de oliva importado. Precio mayorista 4,50 USDT por litro; el proveedor pide mínimo 50 celdas.",
+      "Compramos juntos aceite de oliva importado. Precio mayorista 4,50 USDC por litro; el proveedor pide mínimo 50 celdas.",
     productId: "p1",
     supplierName: "Distribuidora Pérez",
     imageUrl:
@@ -16,7 +16,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
     targetUnits: 100,
     currentUnits: 73,
     unitPrice: 4.5,
-    currency: "USDT",
+    currency: "USDC",
     entryDeposit: 20,
     minUnits: 50,
     swarms: [
@@ -46,7 +46,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g1-norte",
         units: 30,
         paid: 135,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-26",
       },
       {
@@ -55,7 +55,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g1-centro",
         units: 25,
         paid: 112.5,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-27",
       },
       {
@@ -64,7 +64,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g1-norte",
         units: 18,
         paid: 81,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-28",
       },
     ],
@@ -80,7 +80,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
     creatorName: "Luisa Torres",
     productName: "Papel Higiénico Doble Hoja x48",
     description:
-      "Panal para comprar papel higiénico al mayor. 12 USDT por paquete de 48 rollos.",
+      "Panal para comprar papel higiénico al mayor. 12 USDC por paquete de 48 rollos.",
     productId: "p2",
     supplierName: "Distribuidora Pérez",
     imageUrl:
@@ -88,7 +88,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
     targetUnits: 50,
     currentUnits: 50,
     unitPrice: 12.0,
-    currency: "USDT",
+    currency: "USDC",
     entryDeposit: 25,
     minUnits: 20,
     swarms: [
@@ -112,7 +112,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g2-centro",
         units: 15,
         paid: 180,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-24",
       },
       {
@@ -121,7 +121,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g2-centro",
         units: 20,
         paid: 240,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-25",
       },
       {
@@ -130,7 +130,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g2-sur",
         units: 15,
         paid: 180,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-25",
       },
     ],
@@ -154,7 +154,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
     targetUnits: 200,
     currentUnits: 120,
     unitPrice: 8.5,
-    currency: "USDT",
+    currency: "USDC",
     entryDeposit: 30,
     minUnits: 100,
     swarms: [
@@ -190,7 +190,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g3-norte",
         units: 60,
         paid: 510,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-21",
       },
       {
@@ -199,7 +199,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g3-centro",
         units: 40,
         paid: 340,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-22",
       },
       {
@@ -208,7 +208,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g3-sur",
         units: 20,
         paid: 170,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-23",
       },
     ],
@@ -233,7 +233,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
     targetUnits: 150,
     currentUnits: 45,
     unitPrice: 5.0,
-    currency: "USDT",
+    currency: "USDC",
     entryDeposit: 15,
     minUnits: 150,
     swarms: [
@@ -257,7 +257,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g4-norte",
         units: 30,
         paid: 150,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-08-31",
       },
       {
@@ -266,7 +266,7 @@ export const MOCK_GROUPS: BuyingGroup[] = [
         swarmId: "g4-norte",
         units: 15,
         paid: 75,
-        currency: "USDT",
+        currency: "USDC",
         joinedAt: "2026-09-01",
       },
     ],

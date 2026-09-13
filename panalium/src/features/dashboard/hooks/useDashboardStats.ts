@@ -40,9 +40,9 @@ export function useDashboardStats(user: User): DashboardStat[] {
             sub: "en el catálogo",
           },
           {
-            label: "USDT comprometido",
-            value: formatPrice(groupVolume(groups), "USDT", 0),
-            unit: "USDT",
+            label: "USDC comprometido",
+            value: formatPrice(groupVolume(groups), "USDC", 0),
+            unit: "USDC",
             sub: "en todos los Panales",
           },
         ]
@@ -85,7 +85,7 @@ export function useDashboardStats(user: User): DashboardStat[] {
           {
             label: "Celdas comprometidas",
             value: String(totalUnits(mine, user.id)),
-            sub: `${formatPrice(totalInvested(mine, user.id), "USDT")} USDT aportados`,
+            sub: `${formatPrice(totalInvested(mine, user.id), "USDC")} USDC aportados`,
           },
           {
             label: "Hexakeys",

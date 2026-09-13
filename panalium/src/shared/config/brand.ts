@@ -3,5 +3,5 @@ export const BRAND = {
   tagline: "Colmena Web3",
   description:
     "Compras grupales Web3. Únete a un Panal y compra al mayor con otras Abejas.",
-  currency: "USDT",
+  currency: "USDC",
 } as const

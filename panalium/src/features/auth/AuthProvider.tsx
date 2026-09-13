@@ -128,7 +128,7 @@ function mapFirebaseUser(
 
     role: effectiveProfile.role || "buyer",
 
-    wallet: { usdt: 0, bs: 0, address: effectiveProfile.wallet || "" },
+    wallet: { usdc: 0, bs: 0, address: effectiveProfile.wallet || "" },
 
     createdAt: toIsoDate(effectiveProfile.createdAt),
 

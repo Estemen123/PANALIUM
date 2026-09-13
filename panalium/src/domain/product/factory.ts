@@ -15,7 +15,7 @@ export function createProduct(
     name: input.description,
     description: input.description,
     unitPrice: input.unitPrice,
-    currency: "USDT",
+    currency: "USDC",
     minUnits: input.minQuantity,
     image: input.photo
       ? URL.createObjectURL(input.photo)

@@ -132,15 +132,15 @@ npm run wallets:backfill -- --dry-run   # informa sin escribir
 npm run wallets:backfill                # crea las que falten
 ```
 
-**Moneda de la app (USDT).** El frontend muestra los saldos en USDT y permite fondear la smart
-account desde MetaMask. Qué token se envía lo decide el backend con `USDT_TOKEN_ADDRESS`:
+**Moneda de la app (USDC).** El frontend muestra los saldos en USDC y permite fondear la smart
+account desde MetaMask. Qué token se envía lo decide el backend con `USDC_TOKEN_ADDRESS`:
 
 - **Con dirección configurada**: se envía ese ERC-20 y se muestra su saldo real, leído on-chain.
 - **Vacío** (estado actual): no hay ERC-20 en Fuji por defecto, así que el fondeo y el saldo son
-  en AVAX nativo. La interfaz se adapta sola y dice AVAX en vez de USDT.
+  en AVAX nativo. La interfaz se adapta sola y dice AVAX en vez de USDC.
 
-Para activar USDT pon la dirección del contrato en `USDT_TOKEN_ADDRESS` (y sus decimales en
-`USDT_TOKEN_DECIMALS`, 6 por defecto) y **reinicia el servidor**: el watcher sólo vigila `./src`,
+Para activar USDC pon la dirección del contrato en `USDC_TOKEN_ADDRESS` (y sus decimales en
+`USDC_TOKEN_DECIMALS`, 6 por defecto) y **reinicia el servidor**: el watcher sólo vigila `./src`,
 así que un cambio en `.env` no se recoge solo.
 
 **Fotos de producto.** Con `FIREBASE_STORAGE_BUCKET` se suben a Storage y se devuelve una URL firmada.

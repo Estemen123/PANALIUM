@@ -30,9 +30,9 @@ export function useAdminStats(): AdminStat[] {
         sub: "en el catálogo",
       },
       {
-        label: "USDT comprometido",
-        value: formatPrice(groupVolume(groups), "USDT", 0),
-        unit: "USDT",
+        label: "USDC comprometido",
+        value: formatPrice(groupVolume(groups), "USDC", 0),
+        unit: "USDC",
         sub: "en todos los Panales",
       },
     ],

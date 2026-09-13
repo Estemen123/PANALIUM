@@ -40,9 +40,9 @@ export function useGroupActions() {
   const joinGroup = useCallback(
     (group: BuyingGroup, input: JoinGroupInput): ActionResult => {
       const cost = input.units * group.unitPrice
-      if (input.currency === "USDT" && cost > user.wallet.usdt) {
+      if (input.currency === "USDC" && cost > user.wallet.usdc) {
         return fail(
-          `No tienes suficiente USDT en tu reserva. Te faltan ${(cost - user.wallet.usdt).toFixed(2)} USDT.`,
+          `No tienes suficiente USDC en tu reserva. Te faltan ${(cost - user.wallet.usdc).toFixed(2)} USDC.`,
         )
       }
       if (!canJoinSwarm(group, input.swarmId, input.units)) {

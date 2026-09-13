@@ -4,9 +4,9 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
   {
     id: "t1",
     type: "deposit",
-    label: "Depósito de USDT",
+    label: "Depósito de USDC",
     amount: 500,
-    currency: "USDT",
+    currency: "USDC",
     date: "2026-09-03",
   },
   {
@@ -14,7 +14,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "group",
     label: "Panal: Aceite de Oliva",
     amount: -135,
-    currency: "USDT",
+    currency: "USDC",
     date: "2026-08-26",
   },
   {
@@ -22,7 +22,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "group",
     label: "Panal: Papel Higiénico",
     amount: -240,
-    currency: "USDT",
+    currency: "USDC",
     date: "2026-08-25",
   },
   {
@@ -38,7 +38,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "group",
     label: "Panal: Auriculares Bluetooth",
     amount: -340,
-    currency: "USDT",
+    currency: "USDC",
     date: "2026-08-22",
   },
 ]

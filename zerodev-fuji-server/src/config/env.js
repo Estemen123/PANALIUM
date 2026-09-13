@@ -12,14 +12,14 @@ const schema = z.object({
   CHAIN_ID: z.coerce.number().default(43113),
   AVALANCHE_RPC_URL: z.string().url().default('https://api.avax-test.network/ext/bc/C/rpc'),
 
-  // Token ERC-20 que la app usa como moneda (USDT). Si se deja vacio, el fondeo desde una
+  // Token ERC-20 que la app usa como moneda (USDC). Si se deja vacio, el fondeo desde una
   // wallet externa se hace en AVAX nativo, que es lo unico que existe por defecto en Fuji.
-  USDT_TOKEN_ADDRESS: z
+  USDC_TOKEN_ADDRESS: z
     .string()
-    .regex(/^0x[a-fA-F0-9]{40}$/, 'USDT_TOKEN_ADDRESS debe ser una direccion EVM')
+    .regex(/^0x[a-fA-F0-9]{40}$/, 'USDC_TOKEN_ADDRESS debe ser una direccion EVM')
     .optional()
     .or(z.literal('').transform(() => undefined)),
-  USDT_TOKEN_DECIMALS: z.coerce.number().int().min(0).max(36).default(6),
+  USDC_TOKEN_DECIMALS: z.coerce.number().int().min(0).max(36).default(6),
 
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_SERVICE_ACCOUNT_BASE64: z.string().optional(),

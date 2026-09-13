@@ -33,7 +33,7 @@ export function memberEntry(
   return group.members.find((m) => m.userId === userId)
 }
 
-/** USDT aportado por la Abeja en los Panales dados. */
+/** USDC aportado por la Abeja en los Panales dados. */
 export function totalInvested(groups: BuyingGroup[], userId: string): number {
   return groups.reduce((acc, g) => acc + (memberEntry(g, userId)?.paid ?? 0), 0)
 }

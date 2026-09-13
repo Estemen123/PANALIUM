@@ -25,7 +25,7 @@ export default function BuyPanel({
   const fee = subtotal * MARKET_FEE_RATE
   const total = subtotal + fee
   const cur = listing.askCurrency
-  const balance = cur === "USDT" ? wallet.usdt : wallet.bs
+  const balance = cur === "USDC" ? wallet.usdc : wallet.bs
   const remaining = balance - total
 
   return (

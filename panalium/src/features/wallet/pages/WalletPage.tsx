@@ -20,31 +20,24 @@ export default function WalletPage() {
 
   // Mientras el backend responde, mostramos la dirección que ya trae la sesión.
   const address = account?.address || user.wallet.address
-  const usdtBalance =
-    tokenBalance?.formatted ?? formatPrice(user.wallet.usdt, "USDT")
+  const usdcBalance =
+    tokenBalance?.formatted ?? formatPrice(user.wallet.usdc, "USDC")
 
   return (
     <Page width="md">
       <PageHeader
-        title="Reserva de USDT"
-        description="Tu billetera Web3: USDT para comprar en Panales y tokens BS de recompensa."
+        title="Reserva de USDC"
+        description="Tu billetera Web3: USDC para comprar en Panales y tokens BS de recompensa."
       />
       <WalletAddressCard address={address} />
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="mb-6">
         <BalanceCard
-          symbol="USDT"
-          name="USDT"
+          symbol="USDC"
+          name="USDC"
           subtitle="Moneda de la colmena"
           color={COLORS.honey}
-          value={usdtBalance}
-        />
-        <BalanceCard
-          symbol="AVAX"
-          name="AVAX"
-          subtitle={chain?.name ?? "Avalanche Fuji"}
-          color={COLORS.honeyLight}
-          value={account?.balance.avax ?? "0"}
+          value={usdcBalance}
         />
       </div>
 
@@ -57,7 +50,7 @@ export default function WalletPage() {
           className="text-foreground"
           onClick={() => setSendOpen(true)}
         >
-          <Icon.send /> Enviar USDT
+          <Icon.send /> Enviar USDC
         </Button>
       </div>
 

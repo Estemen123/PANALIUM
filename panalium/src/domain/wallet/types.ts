@@ -1,8 +1,8 @@
 import type { Currency, ISODate } from "@/domain/common/types"
 
 export interface Wallet {
-  /** Reserva de USDT. */
-  usdt: number
+  /** Reserva de USDC. */
+  usdc: number
   /** Tokens de recompensa BS. */
   bs: number
   address: string

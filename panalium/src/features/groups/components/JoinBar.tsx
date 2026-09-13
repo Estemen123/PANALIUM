@@ -28,7 +28,7 @@ export default function JoinBar({
         <p className="label text-honey-light">Unirte a este Panal</p>
         <p className="text-[13px] text-secondary-foreground mt-0.5">
           Cada celda son {formatPrice(group.unitPrice, group.currency)}{" "}
-          {group.currency}. Si el Panal no se llena, tus USDT vuelven a tu
+          {group.currency}. Si el Panal no se llena, tus USDC vuelven a tu
           reserva.
         </p>
       </div>

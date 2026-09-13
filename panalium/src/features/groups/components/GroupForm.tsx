@@ -41,7 +41,7 @@ const VARIANT: Record<GroupType, VariantCopy> = {
     defaultDeposit: 10,
     defaultUnits: 100,
     noteTitle: "Depósito de seriedad:",
-    note: "asegura que cada Abeja va en serio. Si el Panal no se llena antes del cierre, los USDT vuelven a cada reserva.",
+    note: "asegura que cada Abeja va en serio. Si el Panal no se llena antes del cierre, los USDC vuelven a cada reserva.",
   },
   international: {
     namePlaceholder: "Ej. Auriculares TWS Bluetooth",
@@ -81,7 +81,7 @@ export default function GroupForm({
     pickupPoint: "",
     targetUnits: "",
     unitPrice: "",
-    currency: "USDT" as Currency,
+    currency: "USDC" as Currency,
     entryDeposit: "",
     deadline: "",
     category: "General",

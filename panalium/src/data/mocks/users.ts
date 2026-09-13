@@ -8,7 +8,7 @@ export const MOCK_USERS: User[] = [
     phone: "+58 412 555-0100",
     role: "buyer",
     wallet: {
-      usdt: 2450.0,
+      usdc: 2450.0,
       bs: 85000,
       address: "0x3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
     },
@@ -24,7 +24,7 @@ export const MOCK_USERS: User[] = [
     phone: "+58 424 555-0200",
     role: "wholesaler",
     wallet: {
-      usdt: 48200.0,
+      usdc: 48200.0,
       bs: 1250000,
       address: "0xb2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
     },
@@ -40,7 +40,7 @@ export const MOCK_USERS: User[] = [
     phone: "+58 212 555-0001",
     role: "admin",
     wallet: {
-      usdt: 0,
+      usdc: 0,
       bs: 0,
       address: "0x9f8e7d6c5b4a39281706f5e4d3c2b1a098765432",
     },
@@ -54,7 +54,7 @@ export const MOCK_USERS: User[] = [
     phone: "+58 414 555-0300",
     role: "buyer",
     wallet: {
-      usdt: 800,
+      usdc: 800,
       bs: 22000,
       address: "0x1122334455667788990011223344556677889900",
     },
@@ -70,7 +70,7 @@ export const MOCK_USERS: User[] = [
     phone: "+58 416 555-0400",
     role: "buyer",
     wallet: {
-      usdt: 3100,
+      usdc: 3100,
       bs: 95000,
       address: "0xaabbccddeeff00112233445566778899aabbccdd",
     },

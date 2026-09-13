@@ -36,8 +36,8 @@ router.get('/chain', (_req, res) => {
     nativeCurrency: chain.nativeCurrency,
     rpcUrl: env.AVALANCHE_RPC_URL,
     explorer: chain.blockExplorers?.default?.url ?? null,
-    token: env.USDT_TOKEN_ADDRESS
-      ? { symbol: 'USDT', address: env.USDT_TOKEN_ADDRESS, decimals: env.USDT_TOKEN_DECIMALS }
+    token: env.USDC_TOKEN_ADDRESS
+      ? { symbol: 'USDC', address: env.USDC_TOKEN_ADDRESS, decimals: env.USDC_TOKEN_DECIMALS }
       : null,
   });
 });

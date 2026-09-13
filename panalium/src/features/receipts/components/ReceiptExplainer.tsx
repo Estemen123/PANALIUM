@@ -39,7 +39,7 @@ export default function ReceiptExplainer({
     >
       Es la llave de tu compra. Cuando llega el producto la{" "}
       <span className="text-foreground font-semibold">reclamas</span> (la
-      Hexakey se quema y retiras la mercancía) o, si necesitas USDT antes, la{" "}
+      Hexakey se quema y retiras la mercancía) o, si necesitas USDC antes, la{" "}
       <span className="text-foreground font-semibold">
         vendes en el Mercado de Abejas
       </span>

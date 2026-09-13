@@ -31,7 +31,7 @@ export default function BalanceCard() {
 
   // Sin ERC-20 configurado en el backend, la reserva se lleva en el token nativo de la red.
 
-  const symbol = chain?.token?.symbol ?? chain?.nativeCurrency.symbol ?? "USDT"
+  const symbol = chain?.token?.symbol ?? chain?.nativeCurrency.symbol ?? "USDC"
 
   const balance =
     tokenBalance?.formatted ?? (chain?.token ? "0" : account?.balance.avax)

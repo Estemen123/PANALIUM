@@ -35,7 +35,7 @@ export function mapBackendProduct(record: BackendProductRecord): Product {
     name: productLabelFromDescription(record.description),
     description: record.description,
     unitPrice: record.unitPrice,
-    currency: "USDT",
+    currency: "USDC",
     minUnits: record.minQuantity,
     image: record.photoUrl,
     category: "Productos",
