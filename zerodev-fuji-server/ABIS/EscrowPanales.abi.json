@@ -1,0 +1,929 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "direccionTesoreria",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "BASE_PORCENTAJES",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "DIRECCION_USDC",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "PORCENTAJE_ADELANTO",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "abejasPorPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "abeja",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "montoPagado",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "pagoCompleto",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "abrirRecoleccion",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "precioFinalUnidad",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "finRecoleccion",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "calcularAdelanto",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "cancelarPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "crearPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "precioEstimadoUnidad",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "minimoUnidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "objetivoUnidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "finReservas",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "unidadesCreador",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "extenderPlazo",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "nuevoFinRecoleccion",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "iniciarCotizacion",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "liberarFondos",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "obtenerEstado",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "enum EscrowPanales.EstadoPanal"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "obtenerFinRecoleccion",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "pagarSaldo",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "panales",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "precioEstimadoUnidad",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "precioFinalUnidad",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "minimoUnidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "objetivoUnidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "unidadesReservadas",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "unidadesPagadasCompletas",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "fondosPagadosCompletos",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "finReservas",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "finRecoleccion",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "estado",
+        "type": "uint8",
+        "internalType": "enum EscrowPanales.EstadoPanal"
+      },
+      {
+        "name": "existe",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "reembolsar",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "renounceOwnership",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "salirDelPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "sellarPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "tesoreria",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      {
+        "name": "newOwner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "unirseAlPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "unirseAlPanalConPagoCompleto",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "usdc",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IERC20"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "AbejaNuevaConPagoCompleto",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "abeja",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "totalPagado",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "AbejaRetirada",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "abeja",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "montoReembolsado",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "AbejaUnidaAlPanal",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "abeja",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "adelanto",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "CotizacionDelPanalIniciada",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "FondosLiberados",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "tesoreria",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "monto",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      {
+        "name": "previousOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PanalCancelado",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PanalCreado",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "precioEstimadoUnidad",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "minimoUnidades",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "objetivoUnidades",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "finReservas",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PanalSellado",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PlazoExtendido",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "nuevoFinRecoleccion",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RecoleccionAbierta",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "precioFinalUnidad",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "finRecoleccion",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ReembolsoAbejaRealizado",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "abeja",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "unidades",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "monto",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SaldoPagado",
+    "inputs": [
+      {
+        "name": "panalId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "abeja",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "saldo",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "totalPagado",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "AbejaNoParticipa",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "AbejaYaParticipa",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "CantidadInvalida",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "DireccionInvalida",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "EstadoInvalido",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "MinimoNoAlcanzado",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "MinimoYaAlcanzado",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "OwnableInvalidOwner",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "OwnableUnauthorizedAccount",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "PagoYaCompleto",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PanalIdInvalido",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PanalNoExiste",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PanalYaExiste",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PlazoAunActivo",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PlazoFinalizado",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PlazoInvalido",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PrecioFinalInvalido",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ReembolsoNoDisponible",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ReentrancyGuardReentrantCall",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SafeERC20FailedOperation",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ObjetivoMenorAlMinimo",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "PanalLleno",
+    "inputs": []
+  }
+]

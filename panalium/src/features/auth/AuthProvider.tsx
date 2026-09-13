@@ -28,7 +28,9 @@ import {
 
 import { loadProductsFromBackend } from "@/features/products/api"
 
-import { productsActions, useAppDispatch } from "@/store"
+import { loadPanalesFromBackend } from "@/features/groups/api"
+
+import { groupsActions, productsActions, useAppDispatch } from "@/store"
 
 export type AuthResult = ActionResult
 
@@ -185,6 +187,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         dispatch(productsActions.setAll([]))
       }
 
+      // Panales reales (Firestore `panales`), ya no los mocks.
+
+      try {
+        dispatch(groupsActions.setAll(await loadPanalesFromBackend(token)))
+      } catch (error) {
+        console.warn("Failed to load backend panales", error)
+
+        dispatch(groupsActions.setAll([]))
+      }
+
       return mapFirebaseUser(firebaseUser, profile)
     },
 
@@ -303,6 +315,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     dispatch(productsActions.setAll([]))
 
+    dispatch(groupsActions.setAll([]))
+
     reset()
   }, [dispatch, reset])
 
@@ -312,6 +326,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null)
 
         dispatch(productsActions.setAll([]))
+
+        dispatch(groupsActions.setAll([]))
 
         setReady(true)
 

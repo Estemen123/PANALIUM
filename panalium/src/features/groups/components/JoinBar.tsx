@@ -3,12 +3,13 @@ import { Button } from "@/shared/ui"
 import { Icon } from "@/shared/icons/Icon"
 import { formatPrice } from "@/shared/lib/format"
 import type { BuyingGroup, JoinGroupInput, Swarm } from "@/domain"
+import { useAdvancePercent } from "../hooks/useGroups"
 
 export interface JoinBarProps {
   group: BuyingGroup
   swarm: Swarm
   maxUnits: number
-  onJoin: (input: JoinGroupInput) => void
+  onJoin: (input: JoinGroupInput) => Promise<void>
 }
 
 /** Franja inferior del detalle: elegir celdas y unirse al Enjambre seleccionado. */
@@ -18,9 +19,21 @@ export default function JoinBar({
   maxUnits,
   onJoin,
 }: JoinBarProps) {
+  const advancePercent = useAdvancePercent()
   const [units, setUnits] = useState(Math.min(10, Math.max(1, maxUnits)))
+  const [loading, setLoading] = useState(false)
   const clamp = (n: number) => Math.min(maxUnits, Math.max(1, n))
   const total = units * group.unitPrice
+  const advance = (total * advancePercent) / 100
+
+  async function handleJoin() {
+    setLoading(true)
+    try {
+      await onJoin({ swarmId: swarm.id, units, currency: group.currency })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="mt-auto flex items-center justify-between gap-4 px-4 py-3.5 bg-elevated rounded-2xl text-foreground">
@@ -28,8 +41,9 @@ export default function JoinBar({
         <p className="label text-honey-light">Unirte a este Panal</p>
         <p className="text-[13px] text-secondary-foreground mt-0.5">
           Cada celda son {formatPrice(group.unitPrice, group.currency)}{" "}
-          {group.currency}. Si el Panal no se llena, tus USDC vuelven a tu
-          reserva.
+          {group.currency}. Pagas el {advancePercent}% ahora (
+          {formatPrice(total, group.currency)} {group.currency} en total) y el
+          resto cuando el Panal se llene.
         </p>
       </div>
       <div className="flex items-center gap-2.5 shrink-0">
@@ -60,13 +74,10 @@ export default function JoinBar({
             <Icon.plus />
           </button>
         </div>
-        <Button
-          onClick={() =>
-            onJoin({ swarmId: swarm.id, units, currency: group.currency })
-          }
-        >
-          Unirme al {swarm.name} · {formatPrice(total, group.currency)}{" "}
-          {group.currency}
+        <Button onClick={handleJoin} disabled={loading}>
+          {loading
+            ? "Pagando en Avalanche..."
+            : `Pagar ${advancePercent}% · ${formatPrice(advance, group.currency, 4)} ${group.currency}`}
         </Button>
       </div>
     </div>

@@ -4,10 +4,16 @@ import { Icon } from "@/shared/icons/Icon"
 import { useFormState } from "@/shared/hooks"
 import { toFloat, toInt } from "@/shared/lib/number"
 import type { CreateGroupInput, Currency, GroupType } from "@/domain"
+import ReserveCellsModal from "./ReserveCellsModal"
+
+/** Mañana en `YYYY-MM-DD`: el contrato exige que el cierre de reservas sea futuro. */
+function tomorrow(): string {
+  return new Date(Date.now() + 86_400_000).toISOString().split("T")[0]
+}
 
 export interface GroupFormProps {
   type: GroupType
-  onSubmit: (input: CreateGroupInput) => void
+  onSubmit: (input: CreateGroupInput) => Promise<void> | void
   onCancel: () => void
   success: boolean
 }
@@ -71,6 +77,8 @@ export default function GroupForm({
   const inputRef = useRef<HTMLInputElement | null>(null)
   const fileInputId = useId()
   const [selectedImage, setSelectedImage] = useState<string>("")
+  const [photo, setPhoto] = useState<File | null>(null)
+  const [isReserveOpen, setReserveOpen] = useState(false)
 
   const { form, bind, setField } = useFormState({
     productName: "",
@@ -93,27 +101,39 @@ export default function GroupForm({
 
     const previewUrl = URL.createObjectURL(file)
     setSelectedImage(previewUrl)
+    setPhoto(file)
     setField("imageUrl", previewUrl)
   }
 
+  const targetUnits = toInt(form.targetUnits, v.defaultUnits)
+  const unitPrice = toFloat(form.unitPrice, 1)
+
+  /** "Fundar" no crea nada todavía: abre el popup para reservar celdas y pagar el adelanto. */
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    setReserveOpen(true)
+  }
 
-    onSubmit({
+  /** Solo cuando el fundador paga su adelanto se crea el Panal en el contrato. */
+  async function handleReserve(reserveUnits: number) {
+    await onSubmit({
       type,
       productName: form.productName || "Producto del Panal",
       description: form.description,
       productLink: form.productLink,
       supplierName: form.supplierName || undefined,
       imageUrl: selectedImage || form.imageUrl,
+      photo,
       pickupPoint: form.pickupPoint || "Por definir",
-      targetUnits: toInt(form.targetUnits, v.defaultUnits),
-      unitPrice: toFloat(form.unitPrice, 1),
+      targetUnits,
+      unitPrice,
       currency: form.currency,
       entryDeposit: toFloat(form.entryDeposit, v.defaultDeposit),
       category: "General",
       deadline: form.deadline || undefined,
+      reserveUnits,
     })
+    setReserveOpen(false)
   }
 
   return (
@@ -183,6 +203,15 @@ export default function GroupForm({
             {...bind("unitPrice")}
           />
         </div>
+
+        <Input
+          label={`${v.deadlineLabel} *`}
+          type="date"
+          min={tomorrow()}
+          required
+          hint="Hasta este día las Abejas pueden reservar celdas en el contrato"
+          {...bind("deadline")}
+        />
       </Card>
 
       {success ? (
@@ -200,6 +229,17 @@ export default function GroupForm({
             Cancelar
           </Button>
         </div>
+      )}
+
+      {isReserveOpen && (
+        <ReserveCellsModal
+          title="Reserva tus celdas"
+          confirmLabel="Pagar y fundar"
+          unitPrice={unitPrice}
+          maxUnits={targetUnits}
+          onClose={() => setReserveOpen(false)}
+          onConfirm={handleReserve}
+        />
       )}
     </form>
   )

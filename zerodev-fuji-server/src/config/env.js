@@ -1,6 +1,14 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
+const evmAddress = (name) =>
+  z
+    .string()
+    .trim()
+    .regex(/^0x[a-fA-F0-9]{40}$/, `${name} debe ser una direccion EVM`)
+    .optional()
+    .or(z.literal('').transform(() => undefined));
+
 const schema = z.object({
   PORT: z.coerce.number().default(3000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -37,12 +45,28 @@ const schema = z.object({
   FIREBASE_APP_ID: z.string().optional(),
   FIREBASE_MEASUREMENT_ID: z.string().optional(),
 
+  // ---------- Contrato EscrowPanales (Avalanche Fuji) ----------
+  // La wallet master es owner del contrato: firma crearPanal y demas funciones de administracion.
+  // Opcionales para que el servidor arranque sin ellas; /api/panales responde 503 si faltan.
+  WALLET_MASTER: evmAddress('WALLET_MASTER'),
+  PRIVATE_KEY_MASTER: z
+    .string()
+    .trim()
+    .regex(/^(0x)?[0-9a-fA-F]{64}$/, 'PRIVATE_KEY_MASTER debe ser una llave privada hex de 32 bytes')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
+  CONTRATO_AVALANCH: evmAddress('CONTRATO_AVALANCH'),
+
   KEY_ENCRYPTION_MASTER_KEY: z
     .string()
     .regex(/^[0-9a-fA-F]{64}$/, 'KEY_ENCRYPTION_MASTER_KEY debe ser 32 bytes en hex (64 caracteres)'),
 });
 
-const parsed = schema.safeParse(process.env);
+const parsed = schema.safeParse({
+  ...process.env,
+  // En el .env la variable quedo escrita como PRIVATE_kEY_MASTER; aceptamos ambas grafias.
+  PRIVATE_KEY_MASTER: process.env.PRIVATE_KEY_MASTER ?? process.env.PRIVATE_kEY_MASTER,
+});
 
 if (!parsed.success) {
   console.error('Configuracion invalida:');

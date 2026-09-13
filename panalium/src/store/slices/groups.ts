@@ -11,10 +11,20 @@ export interface ReplaceGroupAction {
   group: BuyingGroup
 }
 
-export type GroupsAction = AddGroupAction | ReplaceGroupAction
+export interface SetGroupsAction {
+  type: "groups/setAll"
+  groups: BuyingGroup[]
+}
+
+export type GroupsAction = AddGroupAction | ReplaceGroupAction | SetGroupsAction
 
 export const groupsActions = {
   add: (group: BuyingGroup): GroupsAction => ({ type: "groups/add", group }),
+  /** Replaces the whole list (loaded from the backend). */
+  setAll: (groups: BuyingGroup[]): GroupsAction => ({
+    type: "groups/setAll",
+    groups,
+  }),
   /** Replaces the group with the same id (immutable update). */
   replace: (group: BuyingGroup): GroupsAction => ({
     type: "groups/replace",
@@ -28,7 +38,9 @@ export function groupsReducer(
 ): BuyingGroup[] {
   switch (action.type) {
     case "groups/add":
-      return [...state, action.group]
+      return [action.group, ...state.filter((g) => g.id !== action.group.id)]
+    case "groups/setAll":
+      return action.groups
     case "groups/replace":
       return state.map((g) => (g.id === action.group.id ? action.group : g))
     default:

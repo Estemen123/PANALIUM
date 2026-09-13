@@ -1,6 +1,5 @@
 import type { AppState } from "./types"
 import {
-  MOCK_GROUPS,
   MOCK_LISTINGS,
   MOCK_PRODUCTS,
   MOCK_TOKENS,
@@ -12,7 +11,8 @@ export function createInitialState(): AppState {
   return {
     users: MOCK_USERS,
     products: MOCK_PRODUCTS,
-    groups: MOCK_GROUPS,
+    // Los Panales llegan de GET /api/panales al iniciar sesión.
+    groups: [],
     tokens: MOCK_TOKENS,
     listings: MOCK_LISTINGS,
   }

@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import multer from 'multer';
 import { z } from 'zod';
-import { db, storage, FieldValue } from '../config/firebase.js';
-import { env } from '../config/env.js';
+import { db, FieldValue } from '../config/firebase.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 import { HttpError, asyncHandler } from '../middleware/errors.js';
+import { deleteStoredImage, imageUpload as upload, storeImage } from '../services/images.js';
 
 /**
  * Catalogo de productos que consume el frontend de Panalium (src/features/products/api.ts):
@@ -18,21 +17,6 @@ import { HttpError, asyncHandler } from '../middleware/errors.js';
  * puede tocar sus propios productos; admin puede tocar todos.
  */
 const router = Router();
-
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-// Firestore limita cada documento a ~1 MiB; solo cabe una foto inline si es pequena.
-const MAX_INLINE_PHOTO_BYTES = 700 * 1024;
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: MAX_PHOTO_BYTES, files: 1 },
-  fileFilter: (_req, file, cb) => {
-    if (!file.mimetype.startsWith('image/')) {
-      return cb(new HttpError(400, 'La foto debe ser una imagen', { code: 'invalid_photo' }));
-    }
-    cb(null, true);
-  },
-});
 
 const description = z.string().trim().min(1, 'La descripcion es obligatoria').max(2000);
 const link = z.string().trim().min(1, 'El enlace es obligatorio').max(2048);
@@ -80,40 +64,6 @@ function serializeProduct(id, data) {
     createdAt: timestampToIso(data.createdAt),
     updatedAt: timestampToIso(data.updatedAt),
   };
-}
-
-async function storeProductImage(file, uid) {
-  if (env.FIREBASE_STORAGE_BUCKET) {
-    try {
-      const bucket = storage.bucket(env.FIREBASE_STORAGE_BUCKET);
-      const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const photoPath = `products/${uid}/${Date.now()}-${safeName}`;
-      const blob = bucket.file(photoPath);
-      await blob.save(file.buffer, { metadata: { contentType: file.mimetype }, resumable: false });
-      const [photoUrl] = await blob.getSignedUrl({ action: 'read', expires: '2099-12-31T23:59:59.000Z' });
-      return { photoUrl, photoPath };
-    } catch (err) {
-      console.warn(`[products] fallo la subida a Storage, se guarda inline: ${err?.message}`);
-    }
-  }
-
-  if (file.size > MAX_INLINE_PHOTO_BYTES) {
-    throw new HttpError(
-      503,
-      'No se pudo subir la foto. Configura FIREBASE_STORAGE_BUCKET o usa una imagen menor a 700 KB.',
-      { code: 'storage_unavailable' },
-    );
-  }
-  return { photoUrl: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`, photoPath: '' };
-}
-
-async function deleteStoredImage(photoPath) {
-  if (!photoPath || !env.FIREBASE_STORAGE_BUCKET) return;
-  try {
-    await storage.bucket(env.FIREBASE_STORAGE_BUCKET).file(photoPath).delete({ ignoreNotFound: true });
-  } catch (err) {
-    console.warn(`[products] no se pudo borrar la imagen ${photoPath}: ${err?.message}`);
-  }
 }
 
 async function loadProductOrThrow(id) {
@@ -171,7 +121,7 @@ router.post(
     const input = parseOrThrow(createSchema, req.body);
     const { uid } = req.user;
 
-    const { photoUrl, photoPath } = await storeProductImage(req.file, uid);
+    const { photoUrl, photoPath } = await storeImage(req.file, 'products', uid);
     const docRef = await db.collection('products').add({
       ...input,
       photoUrl,
@@ -197,7 +147,7 @@ router.put(
     const changes = parseOrThrow(updateSchema, req.body);
 
     if (req.file) {
-      const stored = await storeProductImage(req.file, req.user.uid);
+      const stored = await storeImage(req.file, 'products', req.user.uid);
       await deleteStoredImage(data.photoPath);
       changes.photoUrl = stored.photoUrl;
       changes.photoPath = stored.photoPath;

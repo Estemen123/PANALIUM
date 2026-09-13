@@ -89,8 +89,8 @@ export default function DashboardPage() {
             type="local"
             success={false}
             onCancel={() => setCreateOpen(false)}
-            onSubmit={(input: Parameters<typeof createGroup>[0]) => {
-              createGroup(input)
+            onSubmit={async (input: Parameters<typeof createGroup>[0]) => {
+              await createGroup(input)
               setCreateOpen(false)
             }}
           />

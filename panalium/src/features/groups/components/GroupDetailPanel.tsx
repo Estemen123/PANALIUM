@@ -17,11 +17,12 @@ import {
 import GroupStatusBadges from "./GroupStatusBadges"
 import SwarmRow from "./SwarmRow"
 import JoinBar from "./JoinBar"
+import { useAdvancePercent } from "../hooks/useGroups"
 
 export interface GroupDetailPanelProps {
   group: BuyingGroup
   user: User
-  onJoin: (input: JoinGroupInput) => void
+  onJoin: (input: JoinGroupInput) => Promise<void>
 }
 
 /** Panel derecho de Panales: detalle del Panal seleccionado y su distribución en Enjambres. */
@@ -30,6 +31,7 @@ export default function GroupDetailPanel({
   user,
   onJoin,
 }: GroupDetailPanelProps) {
+  const advancePercent = useAdvancePercent()
   const [chosenSwarmId, setChosenSwarmId] = useState<string | null>(null)
   const stats = allSwarmStats(group)
   const mySwarm = memberSwarm(group, user.id)
@@ -45,7 +47,7 @@ export default function GroupDetailPanel({
     : 0
   const details = [
     `Fundado por ${group.creatorName}`,
-    `Depósito de seriedad ${formatPrice(group.entryDeposit, group.currency)} ${group.currency}`,
+    `Adelanto ${advancePercent}% al reservar`,
     group.deadline ? `Cierra el ${group.deadline}` : null,
   ].filter(Boolean)
 
@@ -75,6 +77,16 @@ export default function GroupDetailPanel({
           className="inline-flex items-center gap-1.5 text-xs font-bold text-olive hover:text-brown"
         >
           <Icon.link /> Ver producto en el proveedor
+        </a>
+      )}
+      {group.explorerUrl && (
+        <a
+          href={group.explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-olive hover:text-brown"
+        >
+          <Icon.link /> Ver Panal en el contrato (Snowtrace)
         </a>
       )}
 

@@ -5,6 +5,7 @@ import { env } from './config/env.js';
 import { chain } from './config/chain.js';
 import authRoutes from './routes/auth.js';
 import productsRoutes from './routes/products.js';
+import panalesRoutes from './routes/panales.js';
 import configRoutes from './routes/config.js';
 import accountRoutes from './routes/account.js';
 import txRoutes from './routes/tx.js';
@@ -36,6 +37,7 @@ export function createApp() {
   app.use('/api/config', configRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/products', productsRoutes);
+  app.use('/api/panales', panalesRoutes);
 
   // Smart accounts (ZeroDev / Avalanche Fuji)
   app.use('/api/account', accountRoutes);

@@ -98,6 +98,11 @@ Todos requieren `Authorization: Bearer <firebase-id-token>` salvo los marcados c
 | POST | `/api/products` | wholesaler, admin | `multipart/form-data`: `photo`, `description`, `link`, `minQuantity`, `unitPrice` |
 | PUT | `/api/products/:id` | dueño o admin | Mismos campos, todos opcionales |
 | DELETE | `/api/products/:id` | dueño o admin | 204 |
+| GET | `/api/panales/config` | cualquiera | `{ advancePercent, contractAddress }` (adelanto leído de `PORCENTAJE_ADELANTO`) |
+| GET | `/api/panales` | cualquiera | `{ items }` con `members` y `currentUnits`. Con `?mine=1` solo donde el usuario participa |
+| GET | `/api/panales/:id` | cualquiera | `{ item }` con `onchain` leído de `panales(panalId)` en EscrowPanales |
+| POST | `/api/panales` | cualquiera | `multipart/form-data`: `photo?`, `type`, `description`, `link`, `minQuantity`, `targetUnits?`, `unitPrice`, `deadline` (YYYY-MM-DD), `units`. Verifica el saldo USDC del fundador y su smart account manda una UserOp patrocinada por el paymaster de ZeroDev: `approve` del adelanto (40% de `units`) + `crearPanal(panalId, precio, minimo, objetivo, finReservas, unidadesCreador)` en `CONTRATO_AVALANCH`. Solo si se confirma se guarda `panales/{panalId}` |
+| POST | `/api/panales/:id/join` | cualquiera | `{ units }`. Paga el adelanto con `approve` + `unirseAlPanal` y agrega la Abeja a `members` |
 
 El rol sale del custom claim `role`; si no existe se lee de `users/{uid}.role` (por defecto `buyer`).
 En estas rutas el campo `error` es un mensaje legible para el usuario y `code` el código de máquina.

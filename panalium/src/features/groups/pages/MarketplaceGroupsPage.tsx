@@ -131,8 +131,8 @@ export default function MarketplaceGroupsPage() {
               key={selected.id}
               group={selected}
               user={user}
-              onJoin={(input) => {
-                const result = joinGroup(selected, input)
+              onJoin={async (input) => {
+                const result = await joinGroup(selected, input)
 
                 if (!result.ok) {
                   toast(result.error, "error")
@@ -140,7 +140,7 @@ export default function MarketplaceGroupsPage() {
                   return
                 }
 
-                toast("Te uniste al Enjambre. ¡A recolectar!")
+                toast("Pagaste tu adelanto y reservaste tus celdas. ¡A recolectar!")
               }}
             />
           ) : (
@@ -162,8 +162,8 @@ export default function MarketplaceGroupsPage() {
             type="local"
             success={false}
             onCancel={() => setCreateOpen(false)}
-            onSubmit={(input) => {
-              createGroup(input)
+            onSubmit={async (input) => {
+              await createGroup(input)
 
               setCreateOpen(false)
             }}

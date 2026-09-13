@@ -72,8 +72,8 @@ export default function MyGroupsPage() {
             type="local"
             success={false}
             onCancel={() => setCreateOpen(false)}
-            onSubmit={(input) => {
-              createGroup(input)
+            onSubmit={async (input) => {
+              await createGroup(input)
 
               setCreateOpen(false)
             }}

@@ -47,6 +47,9 @@ export interface BuyingGroup {
   deadline?: ISODate
   /** Fecha estimada de llegada (Panales de importación). */
   eta?: ISODate
+  /** Tx de crearPanal en el contrato EscrowPanales. */
+  txHash?: string
+  explorerUrl?: string
 }
 
 export interface CreateGroupInput {
@@ -54,6 +57,8 @@ export interface CreateGroupInput {
   productName: string
   description: string
   imageUrl?: string
+  /** Foto que se sube al backend junto con el Panal. */
+  photo?: File | null
   productId?: string
   productLink?: string
   supplierName?: string
@@ -64,6 +69,8 @@ export interface CreateGroupInput {
   entryDeposit: number
   category: string
   deadline?: ISODate
+  /** Celdas que reserva el fundador; paga el adelanto al fundar. */
+  reserveUnits: number
 }
 
 export interface JoinGroupInput {

@@ -41,8 +41,8 @@ export default function CreateGroupPage({ type }: { type: GroupType }) {
         type={type}
         success={success}
         onCancel={() => navigate("dashboard")}
-        onSubmit={(input) => {
-          createGroup(input)
+        onSubmit={async (input) => {
+          await createGroup(input)
           showSuccess()
         }}
       />
