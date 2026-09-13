@@ -34,6 +34,8 @@ function serializeExaKey(id, d) {
     mintTransactionHash: d.mintTransactionHash ?? null,
     explorerUrl: d.explorerUrl ?? null,
     status: String(d.status ?? 'custodia'),
+    listingId: d.listingId ? String(d.listingId) : null,
+    mock: Boolean(d.mock),
     createdAt: timestampToIso(d.createdAt),
   };
 }

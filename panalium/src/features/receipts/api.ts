@@ -20,6 +20,7 @@ export interface BackendExaKey {
   mintTransactionHash: string | null
   explorerUrl: string | null
   status: string
+  listingId: string | null
   createdAt: string | null
 }
 
@@ -34,13 +35,14 @@ function productLabel(name: string): string {
 }
 
 /**
- * Agrupa las ExaKeys por (token, dueño): la galería muestra una Hexakey por Panal con
- * `amount` = cantidad de unidades. On-chain todas siguen en custodia de la wallet master.
+ * Agrupa las ExaKeys por (token, dueño, publicación): la galería muestra una Hexakey por Panal con
+ * `amount` = cantidad de unidades, y aparte las que están en venta en el Mercado de Abejas.
+ * On-chain todas siguen en custodia de la wallet master.
  */
 export function groupExaKeys(items: BackendExaKey[]): ERC1155Token[] {
   const byKey = new Map<string, ERC1155Token>()
   for (const k of items) {
-    const key = `${k.tokenId}-${k.ownerUid}`
+    const key = `${k.tokenId}-${k.ownerUid}-${k.listingId ?? "libre"}`
     const current = byKey.get(key)
     if (current) {
       current.amount += 1
@@ -55,8 +57,10 @@ export function groupExaKeys(items: BackendExaKey[]): ERC1155Token[] {
       ownerId: k.ownerUid,
       amount: 1,
       mintedAt: k.createdAt ?? new Date().toISOString(),
-      status: "held",
+      status: k.listingId ? "listed" : "held",
       supplierETA: "",
+      listingId: k.listingId ?? undefined,
+      unitPrice: k.unitPrice ?? undefined,
     })
   }
   return [...byKey.values()]

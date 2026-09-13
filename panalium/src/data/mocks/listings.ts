@@ -19,6 +19,11 @@ export const MOCK_LISTINGS: NFTListing[] = [
     listingStatus: "active",
     createdAt: "2026-09-09",
     supplierETA: "2026-10-24",
+    initialAmount: 15,
+    originalUnitPrice: null,
+    offers: [],
+    offersCount: 0,
+    bestOfferPrice: null,
   },
   {
     id: "lst2",
@@ -34,5 +39,10 @@ export const MOCK_LISTINGS: NFTListing[] = [
     listingStatus: "active",
     createdAt: "2026-09-10",
     supplierETA: "2026-10-24",
+    initialAmount: 25,
+    originalUnitPrice: null,
+    offers: [],
+    offersCount: 0,
+    bestOfferPrice: null,
   },
 ]

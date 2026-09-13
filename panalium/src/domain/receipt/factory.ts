@@ -22,6 +22,11 @@ export function createListing(
     listingStatus: "active",
     createdAt: today(),
     supplierETA: token.supplierETA,
+    initialAmount: input.amount,
+    originalUnitPrice: token.unitPrice ?? null,
+    offers: [],
+    offersCount: 0,
+    bestOfferPrice: null,
   }
 }
 

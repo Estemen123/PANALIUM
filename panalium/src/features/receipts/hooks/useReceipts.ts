@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from "react"
 import {
-  createListing,
   tokensForOwner,
   type ERC1155Token,
   type SellReceiptInput,
 } from "@/domain"
 import { receiptsActions, useAppDispatch, useAppState } from "@/store"
 import { useCurrentUser } from "@/features/auth"
-import { fail, ok, type ActionResult } from "@/shared/lib/result"
+import { useListingActions } from "@/features/nft-market"
+import { fail, type ActionResult } from "@/shared/lib/result"
 
 export type { ActionResult } from "@/shared/lib/result"
 
@@ -19,18 +19,19 @@ export function useMyTokens(): ERC1155Token[] {
 }
 
 export function useReceiptActions() {
-  const user = useCurrentUser()
   const dispatch = useAppDispatch()
+  const { publish } = useListingActions()
 
+  /** Publica celdas de la Hexakey en el Mercado de Abejas (Firestore `mercado`). */
   const sellToken = useCallback(
-    (token: ERC1155Token, input: SellReceiptInput): ActionResult => {
+    (token: ERC1155Token, input: SellReceiptInput): Promise<ActionResult> => {
       if (input.amount > token.amount)
-        return fail(`Solo tienes ${token.amount} celdas en esta Hexakey.`)
-      dispatch(receiptsActions.addListing(createListing(token, user, input)))
-      dispatch(receiptsActions.setTokenStatus(token.id, "listed"))
-      return ok
+        return Promise.resolve(fail(`Solo tienes ${token.amount} celdas en esta Hexakey.`))
+      if (!(input.askPrice > 0))
+        return Promise.resolve(fail("El precio por celda debe ser mayor a 0."))
+      return publish({ tokenId: token.tokenId, amount: input.amount, askPrice: input.askPrice })
     },
-    [dispatch, user],
+    [publish],
   )
 
   const burnToken = useCallback(

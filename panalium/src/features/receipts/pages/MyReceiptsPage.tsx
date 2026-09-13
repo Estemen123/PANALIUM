@@ -52,12 +52,9 @@ export default function MyReceiptsPage() {
   function cardProps(token: ERC1155Token) {
     const group = groups.find((g) => g.id === token.groupId)
     const eta = group?.eta ?? token.supplierETA
-    const listing = listings.find(
-      (l) =>
-        l.tokenId === token.tokenId &&
-        l.sellerId === token.ownerId &&
-        l.listingStatus === "active",
-    )
+    const listing = token.listingId
+      ? listings.find((l) => l.id === token.listingId)
+      : undefined
     return {
       eta,
       arrived: Boolean(eta) && eta <= now,
@@ -115,14 +112,15 @@ export default function MyReceiptsPage() {
         <SellReceiptModal
           token={selling}
           onClose={() => setSelling(null)}
-          onSubmit={(input) => {
-            const result = sellToken(selling, input)
+          onSubmit={async (input) => {
+            const result = await sellToken(selling, input)
             if (!result.ok) {
               toast(result.error, "error")
-              return
+              return false
             }
             setSelling(null)
             toast("Tu Hexakey ya está en el Mercado de Abejas.")
+            return true
           }}
         />
       )}

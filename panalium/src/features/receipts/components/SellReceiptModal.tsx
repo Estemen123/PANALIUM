@@ -1,35 +1,44 @@
+import { useState } from "react"
 import { Button, Input, Modal } from "@/shared/ui"
-import { CurrencySelect } from "@/components"
 import { Icon } from "@/shared/icons/Icon"
 import { useFormState } from "@/shared/hooks"
 import { toFloat, toInt } from "@/shared/lib/number"
 import { formatPrice } from "@/shared/lib/format"
-import type { Currency, ERC1155Token, SellReceiptInput } from "@/domain"
+import type { ERC1155Token, SellReceiptInput } from "@/domain"
 
 export interface SellReceiptModalProps {
   token: ERC1155Token
   onClose: () => void
-  onSubmit: (input: SellReceiptInput) => void
+  /** Devuelve si la publicación salió bien, para liberar el botón si falló. */
+  onSubmit: (input: SellReceiptInput) => Promise<boolean>
 }
 
+/** Formulario para publicar celdas de una Hexakey en el Mercado de Abejas al precio que elija la Abeja. */
 export default function SellReceiptModal({
   token,
   onClose,
   onSubmit,
 }: SellReceiptModalProps) {
-  const { form, bind, setField } = useFormState({
-    amount: "1",
-    price: "",
-    currency: "USDC" as Currency,
+  const { form, bind } = useFormState({
+    amount: String(token.amount),
+    price: token.unitPrice ? String(token.unitPrice) : "",
   })
+  const [busy, setBusy] = useState(false)
   const amount = toInt(form.amount, 0)
-  const price = toFloat(form.price, 0)
+  const price = toFloat(form.price.replace(",", "."), 0)
+  const valid = amount >= 1 && amount <= token.amount && price > 0
+
+  async function submit() {
+    setBusy(true)
+    const done = await onSubmit({ amount, askPrice: price, askCurrency: "USDC" })
+    if (!done) setBusy(false)
+  }
 
   return (
     <Modal
-      onClose={onClose}
+      onClose={busy ? () => {} : onClose}
       title="Vender Hexakey"
-      description="Publica celdas de tu Hexakey en el Mercado de Abejas. El precio lo fijas tú."
+      description="Publica celdas de tu Hexakey en el Mercado de Abejas. El precio lo fijas tú y otras Abejas pueden comprarla o hacerte ofertas."
     >
       <div className="bg-surface border border-border rounded-xl p-3 mb-4 flex items-center gap-3">
         <img
@@ -41,6 +50,7 @@ export default function SellReceiptModal({
           <p className="text-sm font-bold">{token.groupName}</p>
           <p className="text-xs text-muted-foreground">
             Tienes {token.amount} celdas disponibles
+            {token.unitPrice ? ` · pagaste ${formatPrice(token.unitPrice, "USDC")} USDC por celda` : ""}
           </p>
         </div>
       </div>
@@ -53,42 +63,27 @@ export default function SellReceiptModal({
           max={token.amount}
           {...bind("amount")}
         />
-        <div className="grid grid-cols-2 gap-3">
-          <Input
-            label="Precio por celda"
-            type="number"
-            step="0.01"
-            placeholder="9,50"
-            {...bind("price")}
-          />
-          <CurrencySelect
-            label="Moneda"
-            value={form.currency}
-            onChange={(c) => setField("currency", c)}
-          />
-        </div>
+        <Input
+          label="Monto por celda (USDC)"
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="9,50"
+          {...bind("price")}
+        />
       </div>
 
-      {form.price && (
+      {price > 0 && amount > 0 && (
         <div className="bg-surface border border-border rounded-xl p-3 mb-4 text-[13px] text-muted-foreground">
-          Total estimado:{" "}
+          Recibirías en total:{" "}
           <span className="mono font-semibold text-brown">
-            {formatPrice(amount * price, form.currency)} {form.currency}
+            {formatPrice(amount * price, "USDC")} USDC
           </span>
         </div>
       )}
 
-      <Button
-        block
-        onClick={() =>
-          onSubmit({
-            amount: Math.max(1, amount),
-            askPrice: price,
-            askCurrency: form.currency,
-          })
-        }
-      >
-        <Icon.tag /> Publicar en el Mercado de Abejas
+      <Button block disabled={!valid || busy} onClick={() => void submit()}>
+        <Icon.tag /> {busy ? "Publicando..." : "Publicar en el Mercado de Abejas"}
       </Button>
     </Modal>
   )

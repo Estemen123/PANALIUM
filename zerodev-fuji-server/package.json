@@ -12,7 +12,8 @@
     "user:role": "node scripts/setRole.mjs",
     "user:admin": "node scripts/createAdmin.mjs",
     "port:free": "node scripts/freePort.mjs",
-    "wallets:backfill": "node scripts/backfillWallets.mjs"
+    "wallets:backfill": "node scripts/backfillWallets.mjs",
+    "mercado:seed": "node scripts/seedMercado.mjs"
   },
   "engines": {
     "node": ">=20"

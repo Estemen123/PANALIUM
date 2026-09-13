@@ -163,11 +163,6 @@
         "internalType": "uint256"
       },
       {
-        "name": "objetivoUnidades",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
         "name": "finReservas",
         "type": "uint64",
         "internalType": "uint64"
@@ -312,11 +307,6 @@
       },
       {
         "name": "minimoUnidades",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "objetivoUnidades",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -665,12 +655,6 @@
         "internalType": "uint256"
       },
       {
-        "name": "objetivoUnidades",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
         "name": "finReservas",
         "type": "uint64",
         "indexed": false,
@@ -915,15 +899,5 @@
         "internalType": "address"
       }
     ]
-  },
-  {
-    "type": "error",
-    "name": "ObjetivoMenorAlMinimo",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "PanalLleno",
-    "inputs": []
   }
 ]

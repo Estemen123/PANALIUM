@@ -22,6 +22,11 @@ export interface SetTokenStatusAction {
   status: TokenStatus
 }
 
+export interface SetListingsAction {
+  type: "listings/setAll"
+  listings: NFTListing[]
+}
+
 export interface AddListingAction {
   type: "listings/add"
   listing: NFTListing
@@ -38,7 +43,7 @@ export interface SetListingStatusAction {
   status: NFTListingStatus
 }
 
-export type ReceiptsAction = AddTokenAction | SetTokensAction | SetTokenStatusAction | AddListingAction | ReplaceListingAction | SetListingStatusAction
+export type ReceiptsAction = AddTokenAction | SetTokensAction | SetTokenStatusAction | SetListingsAction | AddListingAction | ReplaceListingAction | SetListingStatusAction
 
 export const receiptsActions = {
   addToken: (token: ERC1155Token): ReceiptsAction => ({
@@ -54,6 +59,11 @@ export const receiptsActions = {
     type: "tokens/setStatus",
     tokenId,
     status,
+  }),
+  /** Replaces the market listings (loaded from the backend). */
+  setListings: (listings: NFTListing[]): ReceiptsAction => ({
+    type: "listings/setAll",
+    listings,
   }),
   addListing: (listing: NFTListing): ReceiptsAction => ({
     type: "listings/add",
@@ -92,6 +102,8 @@ export function listingsReducer(
   action: AppAction,
 ): NFTListing[] {
   switch (action.type) {
+    case "listings/setAll":
+      return action.listings
     case "listings/add":
       return [...state, action.listing]
     case "listings/replace":

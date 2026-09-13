@@ -31,6 +31,7 @@ import { loadProductsFromBackend } from "@/features/products/api"
 import { loadPanalesFromBackend } from "@/features/groups/api"
 
 import { loadExaKeysFromBackend } from "@/features/receipts/api"
+import { loadMarketFromBackend } from "@/features/nft-market/api"
 
 import {
   groupsActions,
@@ -212,6 +213,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         console.warn("Failed to load backend exakeys", error)
 
         dispatch(receiptsActions.setTokens([]))
+
+        dispatch(receiptsActions.setListings([]))
+      }
+
+      // Mercado de Abejas: publicaciones activas de Firestore `mercado`.
+
+      try {
+        dispatch(receiptsActions.setListings((await loadMarketFromBackend(token)).listings))
+      } catch (error) {
+        console.warn("Failed to load backend mercado", error)
+
+        dispatch(receiptsActions.setListings([]))
       }
 
       return mapFirebaseUser(firebaseUser, profile)
@@ -349,6 +362,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         dispatch(groupsActions.setAll([]))
 
         dispatch(receiptsActions.setTokens([]))
+
+        dispatch(receiptsActions.setListings([]))
 
         setReady(true)
 

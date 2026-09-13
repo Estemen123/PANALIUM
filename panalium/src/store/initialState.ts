@@ -1,9 +1,5 @@
 import type { AppState } from "./types"
-import {
-  MOCK_LISTINGS,
-  MOCK_PRODUCTS,
-  MOCK_USERS,
-} from "@/data/mocks"
+import { MOCK_PRODUCTS, MOCK_USERS } from "@/data/mocks"
 
 /** Seed state. Swap this for an API-backed loader when a backend exists. */
 export function createInitialState(): AppState {
@@ -14,6 +10,7 @@ export function createInitialState(): AppState {
     groups: [],
     // Las Hexakeys (ExaKeys) llegan de GET /api/exakeys al iniciar sesión.
     tokens: [],
-    listings: MOCK_LISTINGS,
+    // El Mercado de Abejas llega de GET /api/mercado (Firestore `mercado`).
+    listings: [],
   }
 }

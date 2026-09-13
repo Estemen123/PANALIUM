@@ -11,6 +11,7 @@ import configRoutes from './routes/config.js';
 import accountRoutes from './routes/account.js';
 import txRoutes from './routes/tx.js';
 import adminEscrowRoutes from './routes/adminEscrow.js';
+import mercadoRoutes from './routes/mercado.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 
 export function createApp() {
@@ -41,6 +42,8 @@ export function createApp() {
   app.use('/api/products', productsRoutes);
   app.use('/api/panales', panalesRoutes);
   app.use('/api/exakeys', exakeysRoutes);
+  // Mercado de Abejas: reventa web2 de Hexakeys
+  app.use('/api/mercado', mercadoRoutes);
   // Consola del owner de EscrowPanales (solo admin)
   app.use('/api/admin/escrow', adminEscrowRoutes);
 
