@@ -21,7 +21,6 @@ export interface EscrowPanalOnchain {
   precioEstimadoUnidad: string
   precioFinalUnidad: string
   minimoUnidades: string
-  objetivoUnidades: string
   unidadesReservadas: string
   unidadesPagadasCompletas: string
   fondosPagadosCompletos: string
@@ -36,6 +35,8 @@ export interface EscrowPanalRow {
   description: string
   createdByName: string
   members: number
+  /** Tope de celdas del Panal (Firestore): el contrato ya no guarda objetivo. */
+  targetUnits: number
   tokenId: number | null
   exakeysEmitidas: boolean
   onchain: EscrowPanalOnchain | null

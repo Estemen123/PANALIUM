@@ -268,7 +268,6 @@ router.post(
       panalId: ref.id,
       precioEstimadoUnidad,
       minimoUnidades: panal.minQuantity,
-      objetivoUnidades: targetUnits,
       finReservas,
       unidadesCreador: reserved,
     });
@@ -343,16 +342,18 @@ router.post(
     if ((data.memberIds ?? []).includes(uid)) {
       throw new HttpError(400, 'Ya participas en este Panal: usa "aumentar participacion"', { code: 'already_member' });
     }
-    return { payment: await unirseAlPanal(uid, { panalId, unidades }), unidades };
+    const objetivoUnidades = Number(data.targetUnits ?? 0);
+    return { payment: await unirseAlPanal(uid, { panalId, unidades, objetivoUnidades }), unidades };
   }),
 );
 
 /** POST /api/panales/:id/aumentar — celdas extra para una Abeja que ya participa */
 router.post(
   '/:id/aumentar',
-  ...abejaAction(async ({ req, uid, panalId }) => {
+  ...abejaAction(async ({ req, uid, panalId, data }) => {
     const { units: unidadesExtra } = parseOrThrow(unitsSchema, req.body);
-    const payment = await aumentarParticipacion(uid, { panalId, unidadesExtra });
+    const objetivoUnidades = Number(data.targetUnits ?? 0);
+    const payment = await aumentarParticipacion(uid, { panalId, unidadesExtra, objetivoUnidades });
     return { payment, unidades: payment.unidades };
   }),
 );

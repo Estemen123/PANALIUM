@@ -51,6 +51,9 @@ export default function EscrowPanalCard({
   const minimo = Number(o.minimoUnidades)
   const pagadas = Number(o.unidadesPagadasCompletas)
   const vencido = o.finRecoleccion > 0 && o.finRecoleccion <= chainNow
+  const reservadasPagadas = reservadas > 0 && pagadas >= reservadas
+  // El contrato libera con el plazo vencido y el mínimo pagado, o antes si todas las celdas pagaron el total.
+  const puedeLiberar = reservadasPagadas || (vencido && pagadas >= minimo)
   const precioFinal = rawToUsdc(o.precioFinalUnidad)
   const meta = ESTADO_META[o.estado] ?? { label: `${o.estado} · ${o.etapa}`, variant: "outline" as const }
 
@@ -77,7 +80,7 @@ export default function EscrowPanalCard({
       <dl className="mono text-[12px] grid grid-cols-4 gap-x-4 gap-y-1">
         <dt className="text-muted-foreground">Reservadas</dt>
         <dd>
-          {reservadas} / {o.objetivoUnidades} (mín. {minimo})
+          {reservadas} / {panal.targetUnits || "—"} (mín. {minimo})
         </dd>
         <dt className="text-muted-foreground">Pagadas completas</dt>
         <dd>{pagadas}</dd>
@@ -138,7 +141,7 @@ export default function EscrowPanalCard({
           <Button
             size="sm"
             onClick={() => onCall("liberarFondos")}
-            disabled={locked || !vencido || pagadas < minimo}
+            disabled={locked || !puedeLiberar}
           >
             {label("liberarFondos", "liberarFondos()")}
           </Button>
@@ -154,7 +157,9 @@ export default function EscrowPanalCard({
           </Button>
           <p className="basis-full text-xs text-muted-foreground">
             {!vencido
-              ? "El contrato no deja liberar ni extender hasta que venza el plazo de recolección."
+              ? reservadasPagadas
+                ? "Todas las celdas pagaron el total: puedes liberar los fondos sin esperar el plazo."
+                : `Faltan ${reservadas - pagadas} celdas por pagar: se podrá liberar antes solo si todas pagan, o al vencer el plazo con el mínimo.`
               : pagadas < minimo
                 ? `Solo ${pagadas} de ${minimo} celdas mínimas pagaron el total: extiende el plazo o cancela.`
                 : "Plazo vencido con el mínimo pagado: ya se pueden liberar los fondos a la tesorería."}

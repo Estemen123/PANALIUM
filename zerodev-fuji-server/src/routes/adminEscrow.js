@@ -108,6 +108,7 @@ router.get(
           description: String(data.description ?? ''),
           createdByName: String(data.createdByName ?? ''),
           members: Array.isArray(data.members) ? data.members.length : 0,
+          targetUnits: Number(data.targetUnits ?? 0),
           tokenId: data.tokenId == null ? null : Number(data.tokenId),
           exakeysEmitidas: Boolean(data.exakeys?.docsCreated),
           txs: data.txs ?? {},

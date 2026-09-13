@@ -62,6 +62,8 @@ export default function PanalAdminModal({ group, onClose }: PanalAdminModalProps
 
   const expired = group.collectionEndsAt ? Date.parse(group.collectionEndsAt) <= Date.now() : false
   const minPaid = (group.paidUnits ?? 0) >= group.minUnits
+  // Con todas las celdas pagadas el contrato deja liberar y sellar sin esperar el cierre.
+  const allPaid = group.currentUnits > 0 && (group.paidUnits ?? 0) >= group.currentUnits
 
   async function run(label: string, action: () => Promise<ActionResult>, success: string, close = false) {
     setError("")
@@ -205,11 +207,24 @@ export default function PanalAdminModal({ group, onClose }: PanalAdminModalProps
               </span>{" "}
               celdas mínimas · cierre {group.collectionEndsAt ? new Date(group.collectionEndsAt).toLocaleString("es-VE") : "—"}
             </p>
-            {!expired ? (
+            {!expired && !allPaid ? (
               <p className="text-[13px] text-muted-foreground">
-                El contrato no permite sellar antes del cierre. Al vencer, el servidor sella el Panal y emite las
-                Hexakeys solo si se pagó el mínimo.
+                Faltan {group.currentUnits - (group.paidUnits ?? 0)} celdas por pagar. Si todas las Abejas pagan el total
+                podrás liberar los fondos y sellar sin esperar el cierre; si no, al vencer el servidor sella el Panal y
+                emite las Hexakeys solo si se pagó el mínimo.
               </p>
+            ) : !expired ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-[13px]">Todas las celdas pagaron el total: puedes liberar los fondos ya.</p>
+                <div>
+                  <Button
+                    onClick={() => run("seal", () => actions.seal(group), "Fondos liberados, Panal sellado y Hexakeys emitidas.", true)}
+                    disabled={busy !== null}
+                  >
+                    {busy === "seal" ? "Sellando..." : "Liberar fondos, sellar y emitir Hexakeys"}
+                  </Button>
+                </div>
+              </div>
             ) : (
               <div className="flex flex-wrap gap-3">
                 <Button

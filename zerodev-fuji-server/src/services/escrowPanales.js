@@ -71,14 +71,16 @@ export async function estimarAdelanto(precioUnidadRaw, unidades) {
   return (BigInt(precioUnidadRaw) * BigInt(unidades) * numerador) / base;
 }
 
-/** Struct `panales(panalId)` con los montos en raw (bigint). null si no existe. */
+/**
+ * Struct `panales(panalId)` con los montos en raw (bigint). null si no existe.
+ * El contrato actual no guarda un objetivo de celdas: el tope del Panal vive en Firestore (`targetUnits`).
+ */
 export async function leerPanalRaw(panalId) {
   assertConfigured();
   const [
     precioEstimadoUnidad,
     precioFinalUnidad,
     minimoUnidades,
-    objetivoUnidades,
     unidadesReservadas,
     unidadesPagadasCompletas,
     fondosPagadosCompletos,
@@ -92,7 +94,6 @@ export async function leerPanalRaw(panalId) {
     precioEstimadoUnidad,
     precioFinalUnidad,
     minimoUnidades,
-    objetivoUnidades,
     unidadesReservadas,
     unidadesPagadasCompletas,
     fondosPagadosCompletos,
@@ -112,7 +113,6 @@ export async function leerPanal(panalId) {
     precioEstimadoUnidad: p.precioEstimadoUnidad.toString(),
     precioFinalUnidad: p.precioFinalUnidad.toString(),
     minimoUnidades: p.minimoUnidades.toString(),
-    objetivoUnidades: p.objetivoUnidades.toString(),
     unidadesReservadas: p.unidadesReservadas.toString(),
     unidadesPagadasCompletas: p.unidadesPagadasCompletas.toString(),
     fondosPagadosCompletos: p.fondosPagadosCompletos.toString(),
@@ -189,10 +189,10 @@ async function enviarUserOp(uid, calls, { cobro = 0n, credito = 0n, accion }) {
 
 /**
  * El usuario funda el Panal y reserva sus celdas en la misma UserOp:
- * crearPanal(panalId, precioEstimadoUnidad, minimoUnidades, objetivoUnidades, finReservas, unidadesCreador).
+ * crearPanal(panalId, precioEstimadoUnidad, minimoUnidades, finReservas, unidadesCreador).
  * El contrato cobra al creador el adelanto (40%) de `unidadesCreador`.
  */
-export async function crearPanal(uid, { panalId, precioEstimadoUnidad, minimoUnidades, objetivoUnidades, finReservas, unidadesCreador }) {
+export async function crearPanal(uid, { panalId, precioEstimadoUnidad, minimoUnidades, finReservas, unidadesCreador }) {
   assertConfigured();
   const adelanto = await estimarAdelanto(precioEstimadoUnidad, unidadesCreador);
   return enviarUserOp(
@@ -204,7 +204,6 @@ export async function crearPanal(uid, { panalId, precioEstimadoUnidad, minimoUni
           panalId,
           BigInt(precioEstimadoUnidad),
           BigInt(minimoUnidades),
-          BigInt(objetivoUnidades),
           BigInt(finReservas),
           BigInt(unidadesCreador),
         ],
@@ -214,14 +213,25 @@ export async function crearPanal(uid, { panalId, precioEstimadoUnidad, minimoUni
   );
 }
 
+/** El contrato ya no limita las reservas: el tope es `targetUnits` del Panal en Firestore. */
+function validarTope(panal, objetivoUnidades, unidades) {
+  if (!objetivoUnidades) return;
+  const libres = BigInt(objetivoUnidades) - panal.unidadesReservadas;
+  if (BigInt(unidades) > libres) {
+    const quedan = libres > 0n ? libres : 0n;
+    throw new HttpError(400, `Solo quedan ${quedan} celdas libres en este Panal`, { code: 'panal_lleno' });
+  }
+}
+
 /**
  * Nueva Abeja en el Panal. En Reservando paga el adelanto (unirseAlPanal); en Recolectando ya hay
  * precio final y entra pagando el total (unirseAlPanalConPagoCompleto).
  */
-export async function unirseAlPanal(uid, { panalId, unidades }) {
+export async function unirseAlPanal(uid, { panalId, unidades, objetivoUnidades }) {
   const panal = await leerPanalRaw(panalId);
   if (!panal) throw new HttpError(404, 'El Panal no existe en el contrato', { code: 'not_found' });
   const u = BigInt(unidades);
+  validarTope(panal, objetivoUnidades, u);
 
   if (panal.estado === ESTADO.RESERVANDO) {
     const cobro = await read('calcularAdelanto', [panalId, u]);
@@ -246,7 +256,7 @@ export async function unirseAlPanal(uid, { panalId, unidades }) {
  *   Reservando:   paga el adelanto del nuevo total.
  *   Recolectando: paga el total al precio final (queda con el pago completo).
  */
-export async function aumentarParticipacion(uid, { panalId, unidadesExtra }) {
+export async function aumentarParticipacion(uid, { panalId, unidadesExtra, objetivoUnidades }) {
   const panal = await leerPanalRaw(panalId);
   if (!panal) throw new HttpError(404, 'El Panal no existe en el contrato', { code: 'not_found' });
   const wallet = await getSmartAccountAddress(uid);
@@ -254,10 +264,7 @@ export async function aumentarParticipacion(uid, { panalId, unidadesExtra }) {
   if (abeja.unidades === 0n) throw new HttpError(400, 'No participas en este Panal', { code: 'no_participa' });
 
   const total = abeja.unidades + BigInt(unidadesExtra);
-  const libres = panal.objetivoUnidades - panal.unidadesReservadas;
-  if (BigInt(unidadesExtra) > libres) {
-    throw new HttpError(400, `Solo quedan ${libres} celdas libres en este Panal`, { code: 'panal_lleno' });
-  }
+  validarTope(panal, objetivoUnidades, unidadesExtra);
 
   if (panal.estado === ESTADO.RESERVANDO) {
     const cobro = await estimarAdelanto(panal.precioEstimadoUnidad, total);

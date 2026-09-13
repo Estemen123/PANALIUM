@@ -50,6 +50,10 @@ const txRef = (tx) => ({ hash: tx.transactionHash, explorerUrl: tx.explorerUrl, 
 
 const panalRef = (panalId) => db.collection('panales').doc(panalId);
 
+/** Todas las celdas reservadas pagaron el total: el contrato deja liberar sin esperar el plazo. */
+export const todosPagaron = (onchain) =>
+  onchain.unidadesReservadas > 0n && onchain.unidadesPagadasCompletas >= onchain.unidadesReservadas;
+
 async function loadPanal(panalId) {
   const snap = await panalRef(panalId).get();
   if (!snap.exists) throw new HttpError(404, 'Panal no encontrado', { code: 'not_found' });
@@ -181,7 +185,9 @@ export async function iniciarNegociacion(panalId, actor) {
 export async function negociarSiEstaLleno(panalId) {
   try {
     const onchain = await leerPanalRaw(panalId);
-    if (onchain?.estado === ESTADO.RESERVANDO && onchain.unidadesReservadas >= onchain.objetivoUnidades) {
+    // El objetivo de celdas ya no esta en el contrato: se toma de Firestore.
+    const objetivo = BigInt(Number((await loadPanal(panalId)).targetUnits ?? 0));
+    if (onchain?.estado === ESTADO.RESERVANDO && objetivo > 0n && onchain.unidadesReservadas >= objetivo) {
       await iniciarNegociacion(panalId, 'auto');
       console.log(`[panales] ${panalId} lleno: negociacion iniciada`);
     }
@@ -426,18 +432,22 @@ async function emitirExaKeys(panalId) {
 }
 
 /**
- * Cierra el Panal cuando vence el cobro con el minimo pagado: liberarFondos -> sellarPanal -> ExaKeys.
+ * Cierra el Panal: liberarFondos -> sellarPanal -> ExaKeys. Se puede con el cobro vencido y el minimo pagado,
+ * o antes del vencimiento si todas las celdas reservadas ya pagaron el total (lo permite el contrato actual).
  * Retoma desde la etapa en la que se haya quedado si un paso fallo antes.
  */
 export async function sellarYEmitir(panalId) {
   let onchain = await onchainOrThrow(panalId);
 
   if (onchain.estado === ESTADO.RECOLECTANDO) {
-    if (onchain.finRecoleccion > (await chainNow())) {
+    if (onchain.finRecoleccion > (await chainNow()) && !todosPagaron(onchain)) {
       const vence = new Date(onchain.finRecoleccion * 1000).toISOString();
-      throw new HttpError(400, `El cobro sigue abierto hasta ${vence}: el contrato no deja sellar antes`, {
-        code: 'plazo_activo',
-      });
+      const faltan = onchain.unidadesReservadas - onchain.unidadesPagadasCompletas;
+      throw new HttpError(
+        400,
+        `El cobro sigue abierto hasta ${vence} y faltan ${faltan} celdas por pagar: solo se puede liberar antes si todas pagaron`,
+        { code: 'plazo_activo' },
+      );
     }
     if (onchain.unidadesPagadasCompletas < onchain.minimoUnidades) {
       await panalRef(panalId).update({ collectionExpired: true });
