@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "zerodev-fuji-server", "run", "dev"],
+      "port": 4000
+    }
+  ]
+}

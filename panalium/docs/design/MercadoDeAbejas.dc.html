@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; background: #1C1C1A; color: #F7F3E8; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #F2B705; } a:hover { color: #F8D66D; }
+    .display { font-family: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+    .hex { clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%); }
+    .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: #68705A; }
+    .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 12px; color: #DDD5C3; font-size: 14px; font-weight: 600; }
+    .nav-active { background: #29251F; color: #F8D66D; }
+    .card { background: #F7F3E8; color: #29251F; border-radius: 16px; border: 1px solid #DDD5C3; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-radius: 12px; white-space: nowrap; }
+    .chip { font-size: 13px; font-weight: 700; height: 36px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; display: flex; background: #1C1C1A; overflow: hidden;">
+
+  <aside style="width: 248px; flex-shrink: 0; border-right: 1px solid #3B3733; display: flex; flex-direction: column; padding: 24px 16px; box-sizing: border-box; gap: 24px;">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 0 8px;">
+      <div class="hex" style="width: 40px; height: 44px; background: #F2B705; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#29251F" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 4v10l-7 4-7-4V7z"></path></svg></div>
+      <div><div class="display" style="font-size: 20px; font-weight: 800; line-height: 1;">Panalium</div><div style="font-size: 11px; color: #DDD5C3; margin-top: 4px;">Colmena Web3</div></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #29251F; border-radius: 14px;">
+      <div class="hex" style="width: 40px; height: 44px; background: #F2B705; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #29251F;">L</div>
+      <div style="min-width: 0;"><div style="font-size: 14px; font-weight: 700;">Luisa Torres</div><div style="font-size: 11px; color: #F8D66D; font-weight: 600;">Abeja verificada</div></div>
+    </div>
+    <nav style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Mi Colmena</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Reserva de Honey</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Panales</div>
+      <div class="nav-item" style="padding-left: 36px; color: #A8A090;">Mis Panales</div>
+      <div class="nav-item" style="padding-left: 36px; color: #A8A090;">Fundar un Panal</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Mis Recibos NFT</div>
+      <div class="nav-item nav-active"><span class="hex" style="width: 12px; height: 13px; background: #F2B705;"></span>Mercado de Abejas</div>
+    </nav>
+    <div style="padding: 14px; border: 1px solid #3B3733; border-radius: 14px; display: flex; flex-direction: column; gap: 4px;">
+      <div class="label" style="color: #DDD5C3;">Reserva de Honey</div>
+      <div class="mono" style="font-size: 18px; font-weight: 600; color: #F8D66D;">2.450,00 <span style="font-size: 12px; color: #DDD5C3;">HNY</span></div>
+    </div>
+    <div style="font-size: 13px; color: #A8A090; padding: 0 12px;">Salir de la colmena</div>
+  </aside>
+
+  <main style="flex-grow: 1; padding: 40px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+      <div>
+        <div class="display" style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05;">Mercado de Abejas</div>
+        <div style="font-size: 14px; color: #DDD5C3; margin-top: 8px;">Compra y vende Hexakeys de Panales en tránsito. El precio lo fija cada Abeja; la Hexakey pasa a tu billetera al instante.</div>
+      </div>
+      <span class="btn" style="height: 44px; padding: 0 20px; border: 1.5px solid #DDD5C3; color: #F7F3E8; font-size: 14px;">Vender una Hexakey</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="chip" style="background: #F2B705; color: #29251F;">Todas las ofertas · 6</span>
+      <span class="chip" style="border: 1.5px solid #3B3733; color: #DDD5C3;">Llegan este mes</span>
+      <span class="chip" style="border: 1.5px solid #3B3733; color: #DDD5C3;">Menos de 10 HNY</span>
+      <span class="chip" style="border: 1.5px solid #3B3733; color: #DDD5C3;">Mis ofertas</span>
+      <div style="margin-left: auto; font-size: 13px; color: #DDD5C3; display: flex; align-items: center; gap: 6px;">Ordenar: <span style="font-weight: 700; color: #F7F3E8;">Precio por celda</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 0.95fr; gap: 16px; flex-grow: 1; min-height: 0;">
+
+      <!-- Listing 1 -->
+      <div class="card" style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="hex" style="width: 64px; height: 72px; background: #68705A; flex-shrink: 0;"></div>
+          <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 700; line-height: 1.2;">Auriculares Bluetooth TWS</div><div class="mono" style="font-size: 11px; color: #68705A; margin-top: 4px;">HEXAKEY #G3</div></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+          <div><div class="label">Precio por celda</div><div class="mono" style="font-size: 26px; font-weight: 600; line-height: 1.1; margin-top: 4px;">9,50 <span style="font-size: 13px; color: #68705A;">HNY</span></div></div>
+          <div style="text-align: right;"><div class="label">Disponibles</div><div class="mono" style="font-size: 20px; font-weight: 600; margin-top: 4px;">15 <span style="font-size: 12px; color: #68705A;">celdas</span></div></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #68705A;">
+          <div style="display: flex; align-items: center; gap: 8px;"><div class="hex" style="width: 20px; height: 22px; background: #F2B705; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #29251F;">C</div>Abeja vendedora: Carlos M.</div>
+          <div style="display: flex; justify-content: space-between;"><span>Llega el 20 mar</span><span style="color: #29251F; font-weight: 600;">Ahorro 5% vs. Panal</span></div>
+        </div>
+        <span class="btn" style="height: 44px; background: #F2B705; color: #29251F; font-size: 14px; margin-top: auto;">Comprar Hexakey</span>
+      </div>
+
+      <!-- Listing 2 -->
+      <div class="card" style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="hex" style="width: 64px; height: 72px; background: #29251F; flex-shrink: 0;"></div>
+          <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 700; line-height: 1.2;">Luces LED RGB para escritorio</div><div class="mono" style="font-size: 11px; color: #68705A; margin-top: 4px;">HEXAKEY #G4</div></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+          <div><div class="label">Precio por celda</div><div class="mono" style="font-size: 26px; font-weight: 600; line-height: 1.1; margin-top: 4px;">5,20 <span style="font-size: 13px; color: #68705A;">HNY</span></div></div>
+          <div style="text-align: right;"><div class="label">Disponibles</div><div class="mono" style="font-size: 20px; font-weight: 600; margin-top: 4px;">8 <span style="font-size: 12px; color: #68705A;">celdas</span></div></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #68705A;">
+          <div style="display: flex; align-items: center; gap: 8px;"><div class="hex" style="width: 20px; height: 22px; background: #68705A; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #F7F3E8;">R</div>Abeja vendedora: Ricardo B.</div>
+          <div style="display: flex; justify-content: space-between;"><span>Llega el 15 mar</span><span style="color: #29251F; font-weight: 600;">+4% vs. Panal</span></div>
+        </div>
+        <span class="btn" style="height: 44px; background: #F2B705; color: #29251F; font-size: 14px; margin-top: auto;">Comprar Hexakey</span>
+      </div>
+
+      <!-- Listing 3 (own) -->
+      <div class="card" style="padding: 18px; display: flex; flex-direction: column; gap: 14px; border: 2px solid #F8D66D;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="hex" style="width: 64px; height: 72px; background: #F8D66D; flex-shrink: 0;"></div>
+          <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 700; line-height: 1.2;">Auriculares Bluetooth TWS</div><div class="mono" style="font-size: 11px; color: #68705A; margin-top: 4px;">HEXAKEY #G3</div></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+          <div><div class="label">Precio por celda</div><div class="mono" style="font-size: 26px; font-weight: 600; line-height: 1.1; margin-top: 4px;">9,50 <span style="font-size: 13px; color: #68705A;">HNY</span></div></div>
+          <div style="text-align: right;"><div class="label">Disponibles</div><div class="mono" style="font-size: 20px; font-weight: 600; margin-top: 4px;">10 <span style="font-size: 12px; color: #68705A;">celdas</span></div></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #68705A;">
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #F8D66D; color: #29251F;">Tu oferta</span>Publicada hace 2 días</div>
+          <div style="display: flex; justify-content: space-between;"><span>Llega el 20 mar</span><span style="color: #29251F; font-weight: 600;">3 Abejas la vieron</span></div>
+        </div>
+        <span class="btn" style="height: 44px; border: 1.5px solid #29251F; color: #29251F; font-size: 14px; margin-top: auto;">Retirar oferta</span>
+      </div>
+
+      <!-- Purchase panel -->
+      <div style="background: #29251F; border: 1px solid #68705A; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px; color: #F7F3E8;">
+        <div>
+          <div class="label" style="color: #F8D66D;">Comprar Hexakey</div>
+          <div class="display" style="font-size: 20px; font-weight: 700; margin-top: 4px; line-height: 1.15;">Auriculares Bluetooth TWS</div>
+          <div class="mono" style="font-size: 11px; color: #DDD5C3; margin-top: 4px;">HEXAKEY #G3 · vende Carlos M.</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div class="label" style="color: #DDD5C3;">Celdas a comprar (máx. 15)</div>
+          <div style="height: 44px; border: 1.5px solid #68705A; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px;">
+            <span style="font-size: 18px; color: #DDD5C3;">−</span><span class="mono" style="font-size: 16px; font-weight: 600;">5</span><span style="font-size: 18px; color: #F8D66D;">+</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; background: #1C1C1A; border-radius: 12px; font-size: 13px;">
+          <div style="display: flex; justify-content: space-between; color: #DDD5C3;"><span>5 celdas × 9,50 HNY</span><span class="mono">47,50</span></div>
+          <div style="display: flex; justify-content: space-between; color: #DDD5C3;"><span>Comisión de la colmena 2%</span><span class="mono">0,95</span></div>
+          <div style="height: 1px; background: #3B3733;"></div>
+          <div style="display: flex; justify-content: space-between; font-weight: 700;"><span>Total</span><span class="mono" style="color: #F8D66D;">48,45 HNY</span></div>
+          <div style="font-size: 12px; color: #68705A;">Te quedan 2.401,55 HNY después de la compra</div>
+        </div>
+        <div style="font-size: 12px; color: #DDD5C3; line-height: 1.5;">La Hexakey vuela a tu billetera al confirmar. Podrás reclamar el producto cuando el Panal llegue o volver a venderla aquí.</div>
+        <span class="btn" style="height: 48px; background: #F2B705; color: #29251F; font-size: 15px; margin-top: auto;">Confirmar compra · 48,45 HNY</span>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+</body>
+</html>

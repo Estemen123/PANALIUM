@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; background: #1C1C1A; color: #F7F3E8; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #F2B705; } a:hover { color: #F8D66D; }
+    .display { font-family: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+    .hex { clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%); }
+    .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: #68705A; }
+    .section-title { font-family: 'Bricolage Grotesque', 'Manrope', sans-serif; font-size: 24px; font-weight: 700; color: #F8D66D; }
+    .section-sub { font-size: 13px; color: #DDD5C3; margin-top: 4px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-radius: 12px; font-family: 'Manrope', sans-serif; white-space: nowrap; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; min-height: 1560px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; gap: 48px; background: #1C1C1A;">
+
+  <div>
+    <div class="display" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em;">Sistema de diseño base</div>
+    <div style="font-size: 14px; color: #DDD5C3; margin-top: 6px;">Paleta, tipografía y componentes principales de Panalium. Todo lo que aparece en las pantallas se construye con estas piezas.</div>
+  </div>
+
+  <!-- 1. Paleta -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <div><div class="section-title">1 · Paleta de colores</div><div class="section-sub">Siete colores de marca. El amarillo miel es la única acción principal; el verde oliva marca lo completado.</div></div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 14px;">
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #1C1C1A;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Negro carbón</div><div class="mono" style="font-size: 12px; color: #68705A;">#1C1C1A</div><div style="font-size: 12px; margin-top: 6px; color: #29251F;">Fondo principal y barra lateral</div></div></div>
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #F7F3E8;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Crema</div><div class="mono" style="font-size: 12px; color: #68705A;">#F7F3E8</div><div style="font-size: 12px; margin-top: 6px;">Superficies de contenido, tarjetas</div></div></div>
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #F2B705;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Amarillo miel</div><div class="mono" style="font-size: 12px; color: #68705A;">#F2B705</div><div style="font-size: 12px; margin-top: 6px;">Acción principal, progreso, marca</div></div></div>
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #F8D66D;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Miel claro</div><div class="mono" style="font-size: 12px; color: #68705A;">#F8D66D</div><div style="font-size: 12px; margin-top: 6px;">Hover, resaltados, títulos sobre carbón</div></div></div>
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #68705A;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Verde oliva</div><div class="mono" style="font-size: 12px; color: #68705A;">#68705A</div><div style="font-size: 12px; margin-top: 6px;">Completado, éxito, texto auxiliar</div></div></div>
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #29251F;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Marrón carbón</div><div class="mono" style="font-size: 12px; color: #68705A;">#29251F</div><div style="font-size: 12px; margin-top: 6px;">Texto sobre crema, tarjetas elevadas</div></div></div>
+      <div style="border-radius: 16px; overflow: hidden; border: 1px solid #DDD5C3;"><div style="height: 96px; background: #DDD5C3;"></div><div style="padding: 12px 14px; background: #F7F3E8; color: #29251F;"><div style="font-weight: 700; font-size: 14px;">Beige</div><div class="mono" style="font-size: 12px; color: #68705A;">#DDD5C3</div><div style="font-size: 12px; margin-top: 6px;">Bordes, divisores, pistas de progreso</div></div></div>
+    </div>
+    <div style="display: flex; gap: 24px; font-size: 13px; color: #DDD5C3;">
+      <div><span style="font-weight: 700; color: #F8D66D;">Contraste:</span> texto marrón carbón sobre crema 14,6:1 · texto crema sobre carbón 15,9:1 · marrón sobre amarillo miel 8,2:1. Nunca texto claro sobre amarillo miel.</div>
+    </div>
+  </div>
+
+  <!-- 2. Tipografía -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <div><div class="section-title">2 · Tipografía</div><div class="section-sub">Tres familias, cada una con un trabajo: titulares con carácter, cuerpo neutro y monoespaciada para cifras de Honey e identificadores de Hexakey.</div></div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px;">
+        <div class="label">Titulares · Bricolage Grotesque</div>
+        <div class="display" style="font-size: 40px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin-top: 14px;">Mi Colmena</div>
+        <div class="display" style="font-size: 28px; font-weight: 700; margin-top: 10px;">Panales abiertos</div>
+        <div class="display" style="font-size: 20px; font-weight: 700; margin-top: 8px;">Tu Enjambre</div>
+        <div style="font-size: 12px; color: #68705A; margin-top: 14px;">H1 40/800 · H2 28/700 · H3 20/700. Interletrado -2% en H1.</div>
+      </div>
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px;">
+        <div class="label">Cuerpo · Manrope</div>
+        <div style="font-size: 16px; line-height: 1.55; margin-top: 14px;">Cada Panal reúne Abejas que compran juntas para alcanzar el mínimo del proveedor.</div>
+        <div style="font-size: 14px; font-weight: 600; margin-top: 10px;">Texto de tarjeta 14/600</div>
+        <div style="font-size: 13px; color: #68705A; margin-top: 6px;">Texto auxiliar 13/400 en verde oliva</div>
+        <div class="label" style="margin-top: 10px;">Etiqueta 11 · mayúsculas · 12% interletrado</div>
+        <div style="font-size: 12px; color: #68705A; margin-top: 14px;">Cuerpo 16/400 · Tarjeta 14/600 · Auxiliar 13/400 · Etiqueta 11/700.</div>
+      </div>
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px;">
+        <div class="label">Cifras · JetBrains Mono</div>
+        <div class="mono" style="font-size: 36px; font-weight: 600; margin-top: 14px;">2.450,00 <span style="font-size: 18px; color: #68705A;">HNY</span></div>
+        <div class="mono" style="font-size: 14px; margin-top: 10px;">Hexakey #G3 · 40 celdas</div>
+        <div class="mono" style="font-size: 12px; color: #68705A; margin-top: 6px;">0x3a4b…1a2b</div>
+        <div style="font-size: 12px; color: #68705A; margin-top: 14px;">Saldos, precios, IDs de token y direcciones. Siempre con la unidad HNY en oliva.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Botones -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <div><div class="section-title">3 · Botones</div><div class="section-sub">Altura 44 px por defecto (36 compacto, 52 destacado). Radio 12 px. Un solo botón miel por pantalla.</div></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;">
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+        <div class="label">Sobre crema</div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span class="btn" style="height: 44px; padding: 0 20px; background: #F2B705; color: #29251F; font-size: 14px;">Fundar un Panal</span>
+          <span class="btn" style="height: 44px; padding: 0 20px; background: transparent; color: #29251F; border: 1.5px solid #29251F; font-size: 14px;">Ver Enjambres</span>
+          <span class="btn" style="height: 44px; padding: 0 12px; background: transparent; color: #68705A; font-size: 14px;">Cancelar</span>
+          <span class="btn" style="height: 44px; padding: 0 20px; background: #29251F; color: #F8D66D; font-size: 14px;">Quemar Hexakey</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span class="btn" style="height: 36px; padding: 0 14px; background: #F2B705; color: #29251F; font-size: 13px;">Unirme</span>
+          <span class="btn" style="height: 52px; padding: 0 28px; background: #F2B705; color: #29251F; font-size: 16px;">Entrar a la colmena</span>
+          <span class="btn" style="height: 44px; padding: 0 20px; background: #F8D66D; color: #29251F; font-size: 14px;">Hover</span>
+          <span class="btn" style="height: 44px; padding: 0 20px; background: #DDD5C3; color: #68705A; font-size: 14px;">Deshabilitado</span>
+        </div>
+        <div style="font-size: 12px; color: #68705A;">Primario · Secundario · Terciario · Destructivo (marrón carbón con texto miel claro). Hover: miel claro. Deshabilitado: beige.</div>
+      </div>
+      <div style="background: #29251F; color: #F7F3E8; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 16px; border: 1px solid #68705A;">
+        <div class="label" style="color: #DDD5C3;">Sobre carbón</div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span class="btn" style="height: 44px; padding: 0 20px; background: #F2B705; color: #29251F; font-size: 14px;">Comprar Hexakey</span>
+          <span class="btn" style="height: 44px; padding: 0 20px; background: transparent; color: #F7F3E8; border: 1.5px solid #DDD5C3; font-size: 14px;">Ir al Mercado de Abejas</span>
+          <span class="btn" style="height: 44px; padding: 0 12px; background: transparent; color: #DDD5C3; font-size: 14px;">Cerrar</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span class="btn" style="height: 44px; width: 44px; background: #F2B705; color: #29251F;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+          <span class="btn" style="height: 44px; width: 44px; background: transparent; color: #F7F3E8; border: 1.5px solid #DDD5C3;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></span>
+          <span class="btn" style="height: 44px; padding: 0 20px; background: #68705A; color: #F7F3E8; font-size: 14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Panal lleno</span>
+        </div>
+        <div style="font-size: 12px; color: #DDD5C3;">Iconos de trazo 2 px en rejilla de 24. Botón de icono 44×44. El oliva sólido solo se usa para confirmar un estado completado.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Tarjetas hexagonales + estados + progreso -->
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+
+    <div style="display: flex; flex-direction: column; gap: 18px;">
+      <div><div class="section-title">4 · Tarjetas hexagonales</div><div class="section-sub">Hexágono de lados verticales (clip-path). Se usa para Hexakeys, avatares y marcadores.</div></div>
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px; display: flex; gap: 20px; align-items: flex-start;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div class="hex" style="width: 150px; height: 168px; background: #29251F; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 14px 22px; box-sizing: border-box;">
+            <div style="position: absolute; inset: 0; background: #68705A; opacity: 0.35;"></div>
+            <div style="position: relative; font-size: 10px; font-weight: 700; color: #F8D66D; letter-spacing: 0.1em;">HEXAKEY</div>
+            <div class="mono" style="position: relative; font-size: 13px; color: #F7F3E8; font-weight: 600;">#G3 · 40</div>
+          </div>
+          <div style="font-size: 12px; color: #68705A; text-align: center;">Hexakey 150×168<br>imagen + etiqueta</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="hex" style="width: 44px; height: 48px; background: #F2B705; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #29251F;">L</div>
+            <div style="font-size: 12px; color: #68705A;">Avatar Abeja 44×48</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex;"><div class="hex" style="width: 28px; height: 31px; background: #F2B705; color: #29251F; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;">C</div><div class="hex" style="width: 28px; height: 31px; background: #F8D66D; color: #29251F; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -8px;">L</div><div class="hex" style="width: 28px; height: 31px; background: #68705A; color: #F7F3E8; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -8px;">R</div><div class="hex" style="width: 28px; height: 31px; background: #DDD5C3; color: #29251F; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -8px;">+9</div></div>
+            <div style="font-size: 12px; color: #68705A;">Enjambre (grupo de Abejas)</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="hex" style="width: 18px; height: 20px; background: #F2B705;"></div>
+            <div style="font-size: 12px; color: #68705A;">Marcador de navegación activa</div>
+          </div>
+          <div style="border: 1px solid #DDD5C3; border-radius: 16px; padding: 12px 14px; font-size: 12px; color: #29251F; line-height: 1.5;">Tarjeta rectangular: crema, borde beige 1 px, radio 16, sombra 0 1 0 #DDD5C3. Hover: borde marrón carbón.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 18px;">
+      <div><div class="section-title">5 · Barras de progreso</div><div class="section-sub">El Panal se "llena de miel". Dos variantes: continua y por celdas.</div></div>
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;"><span style="font-weight: 700;">Recolectando</span><span class="mono" style="color: #68705A;">146 / 200 celdas</span></div>
+          <div style="height: 10px; background: #DDD5C3; border-radius: 999px; overflow: hidden;"><div style="width: 73%; height: 100%; background: #F2B705; border-radius: 999px;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;"><span style="font-weight: 700; color: #68705A;">Panal lleno</span><span class="mono" style="color: #68705A;">50 / 50 celdas</span></div>
+          <div style="height: 10px; background: #DDD5C3; border-radius: 999px; overflow: hidden;"><div style="width: 100%; height: 100%; background: #68705A; border-radius: 999px;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;"><span style="font-weight: 700;">Por celdas · Enjambre Norte</span><span class="mono" style="color: #68705A;">7 / 10</span></div>
+          <div style="display: flex; gap: 4px;">
+            <div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #F2B705;"></div><div class="hex" style="width: 26px; height: 29px; background: #DDD5C3;"></div><div class="hex" style="width: 26px; height: 29px; background: #DDD5C3;"></div><div class="hex" style="width: 26px; height: 29px; background: #DDD5C3;"></div>
+          </div>
+        </div>
+        <div style="font-size: 12px; color: #68705A;">Pista beige, relleno miel, 10 px de alto. Al 100% el relleno pasa a oliva y la etiqueta a "Panal lleno". Transición 500 ms.</div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 18px;">
+      <div><div class="section-title">6 · Estados y campos</div><div class="section-sub">Etiquetas de estado de un Panal y campos de formulario.</div></div>
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #F8D66D; color: #29251F;">Recolectando</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #68705A; color: #F7F3E8;">Panal lleno</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #F2B705; color: #29251F;">Néctar enviado</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #DDD5C3; color: #29251F;">Sellado</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid #DDD5C3; color: #68705A;">Panal disuelto</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #29251F; color: #F8D66D;">Importación</span>
+        </div>
+        <div style="font-size: 12px; color: #68705A;">Abierto → Recolectando · Financiado → Panal lleno · Pagado al proveedor → Néctar enviado · Cerrado → Sellado · Cancelado → Panal disuelto.</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div class="label">Celdas que aportas</div>
+          <div style="height: 44px; border: 1.5px solid #DDD5C3; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; padding: 0 14px; font-size: 14px; color: #29251F; justify-content: space-between;"><span>30</span><span class="mono" style="font-size: 12px; color: #68705A;">= 135 HNY</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div class="label">Buscar Panales</div>
+          <div style="height: 44px; border: 1.5px solid #F2B705; border-radius: 12px; background: #FFFFFF; box-shadow: 0 0 0 3px #F8D66D; display: flex; align-items: center; padding: 0 14px; font-size: 14px; color: #68705A; gap: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Aceite de oliva…</div>
+        </div>
+        <div style="font-size: 12px; color: #68705A;">Campo 44 px, borde beige 1,5 px, foco miel con halo miel claro. Fondo blanco sobre superficies crema.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

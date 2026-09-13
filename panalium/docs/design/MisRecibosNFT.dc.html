@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; background: #1C1C1A; color: #F7F3E8; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #F2B705; } a:hover { color: #F8D66D; }
+    .display { font-family: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+    .hex { clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%); }
+    .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: #68705A; }
+    .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 12px; color: #DDD5C3; font-size: 14px; font-weight: 600; }
+    .nav-active { background: #29251F; color: #F8D66D; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-radius: 12px; white-space: nowrap; }
+    .key { width: 236px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .key-hex { width: 236px; height: 264px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 22px 40px; box-sizing: border-box; }
+    .key-actions { display: flex; gap: 8px; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; display: flex; background: #1C1C1A; overflow: hidden;">
+
+  <aside style="width: 248px; flex-shrink: 0; border-right: 1px solid #3B3733; display: flex; flex-direction: column; padding: 24px 16px; box-sizing: border-box; gap: 24px;">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 0 8px;">
+      <div class="hex" style="width: 40px; height: 44px; background: #F2B705; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#29251F" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 4v10l-7 4-7-4V7z"></path></svg></div>
+      <div><div class="display" style="font-size: 20px; font-weight: 800; line-height: 1;">Panalium</div><div style="font-size: 11px; color: #DDD5C3; margin-top: 4px;">Colmena Web3</div></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #29251F; border-radius: 14px;">
+      <div class="hex" style="width: 40px; height: 44px; background: #F2B705; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #29251F;">L</div>
+      <div style="min-width: 0;"><div style="font-size: 14px; font-weight: 700;">Luisa Torres</div><div style="font-size: 11px; color: #F8D66D; font-weight: 600;">Abeja verificada</div></div>
+    </div>
+    <nav style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Mi Colmena</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Reserva de Honey</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Panales</div>
+      <div class="nav-item" style="padding-left: 36px; color: #A8A090;">Mis Panales</div>
+      <div class="nav-item" style="padding-left: 36px; color: #A8A090;">Fundar un Panal</div>
+      <div class="nav-item nav-active"><span class="hex" style="width: 12px; height: 13px; background: #F2B705;"></span>Mis Recibos NFT</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Mercado de Abejas</div>
+    </nav>
+    <div style="padding: 14px; border: 1px solid #3B3733; border-radius: 14px; display: flex; flex-direction: column; gap: 4px;">
+      <div class="label" style="color: #DDD5C3;">Reserva de Honey</div>
+      <div class="mono" style="font-size: 18px; font-weight: 600; color: #F8D66D;">2.450,00 <span style="font-size: 12px; color: #DDD5C3;">HNY</span></div>
+    </div>
+    <div style="font-size: 13px; color: #A8A090; padding: 0 12px;">Salir de la colmena</div>
+  </aside>
+
+  <main style="flex-grow: 1; padding: 40px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px; overflow: hidden;">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+      <div>
+        <div class="display" style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05;">Mis Recibos NFT</div>
+        <div style="font-size: 14px; color: #DDD5C3; margin-top: 8px;">Tus Hexakeys: cada una es un token ERC-1155 que certifica tus celdas en un Panal ya pagado.</div>
+      </div>
+      <span class="btn" style="height: 44px; padding: 0 20px; border: 1.5px solid #DDD5C3; color: #F7F3E8; font-size: 14px;">Ir al Mercado de Abejas</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid #68705A; border-radius: 14px; background: #29251F;">
+      <div class="hex" style="width: 34px; height: 38px; background: #F2B705; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#29251F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg></div>
+      <div style="font-size: 13px; color: #DDD5C3; line-height: 1.5;"><span style="font-weight: 700; color: #F8D66D;">¿Qué es una Hexakey?</span> Es la llave de tu compra. Cuando llega el producto la <span style="color: #F7F3E8; font-weight: 600;">reclamas</span> (la Hexakey se quema y retiras la mercancía) o, si necesitas Honey antes, la <span style="color: #F7F3E8; font-weight: 600;">vendes en el Mercado de Abejas</span>.</div>
+      <div style="margin-left: auto; display: flex; gap: 18px; font-size: 12px; color: #DDD5C3; white-space: nowrap;"><span><span class="mono" style="color: #F8D66D; font-weight: 600;">2</span> en custodia</span><span><span class="mono" style="color: #F8D66D; font-weight: 600;">1</span> en venta</span><span><span class="mono" style="color: #F8D66D; font-weight: 600;">1</span> reclamada</span></div>
+    </div>
+
+    <!-- Filters -->
+    <div style="display: flex; gap: 8px;">
+      <span style="font-size: 13px; font-weight: 700; height: 36px; padding: 0 14px; border-radius: 999px; background: #F2B705; color: #29251F; display: inline-flex; align-items: center;">Todas · 4</span>
+      <span style="font-size: 13px; font-weight: 700; height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #3B3733; color: #DDD5C3; display: inline-flex; align-items: center;">En custodia</span>
+      <span style="font-size: 13px; font-weight: 700; height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #3B3733; color: #DDD5C3; display: inline-flex; align-items: center;">En venta</span>
+      <span style="font-size: 13px; font-weight: 700; height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #3B3733; color: #DDD5C3; display: inline-flex; align-items: center;">Reclamadas</span>
+    </div>
+
+    <!-- Honeycomb grid -->
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
+
+      <div class="key">
+        <div class="hex key-hex" style="background: #68705A;">
+          <div style="position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: center;"><span class="mono" style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: #F8D66D; background: #29251F; padding: 4px 10px; border-radius: 999px;">HEXAKEY · ERC-1155</span></div>
+          <div style="position: absolute; top: 58px; left: 0; right: 0; display: flex; justify-content: center;"><span style="font-size: 10px; font-weight: 700; color: #29251F; background: #F8D66D; padding: 4px 10px; border-radius: 999px;">Lista para reclamar</span></div>
+          <div style="font-size: 15px; font-weight: 700; color: #F7F3E8; line-height: 1.15; text-align: center;">Auriculares Bluetooth TWS</div>
+          <div class="mono" style="font-size: 12px; color: #F8D66D; text-align: center; margin-top: 6px;">#G3 · 20 celdas</div>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #DDD5C3;">Llegó el 20 mar · Enjambre Norte</div>
+        <div class="key-actions">
+          <span class="btn" style="height: 36px; padding: 0 16px; background: #F2B705; color: #29251F; font-size: 13px;">Reclamar</span>
+          <span class="btn" style="height: 36px; padding: 0 16px; border: 1.5px solid #DDD5C3; color: #F7F3E8; font-size: 13px;">Vender</span>
+        </div>
+      </div>
+
+      <div class="key" style="margin-top: 132px;">
+        <div class="hex key-hex" style="background: #29251F; border: 1px solid #68705A;">
+          <div style="position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: center;"><span class="mono" style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: #F8D66D; background: #1C1C1A; padding: 4px 10px; border-radius: 999px;">HEXAKEY · ERC-1155</span></div>
+          <div style="position: absolute; top: 58px; left: 0; right: 0; display: flex; justify-content: center;"><span style="font-size: 10px; font-weight: 700; color: #29251F; background: #DDD5C3; padding: 4px 10px; border-radius: 999px;">En custodia</span></div>
+          <div style="font-size: 15px; font-weight: 700; color: #F7F3E8; line-height: 1.15; text-align: center;">Luces LED RGB para escritorio</div>
+          <div class="mono" style="font-size: 12px; color: #F8D66D; text-align: center; margin-top: 6px;">#G4 · 15 celdas</div>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #DDD5C3;">Llega el 15 mar · en tránsito</div>
+        <div class="key-actions">
+          <span class="btn" style="height: 36px; padding: 0 16px; background: #DDD5C3; color: #68705A; font-size: 13px;">Reclamar</span>
+          <span class="btn" style="height: 36px; padding: 0 16px; border: 1.5px solid #DDD5C3; color: #F7F3E8; font-size: 13px;">Vender</span>
+        </div>
+      </div>
+
+      <div class="key">
+        <div class="hex key-hex" style="background: #F8D66D;">
+          <div style="position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: center;"><span class="mono" style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: #F8D66D; background: #29251F; padding: 4px 10px; border-radius: 999px;">HEXAKEY · ERC-1155</span></div>
+          <div style="position: absolute; top: 58px; left: 0; right: 0; display: flex; justify-content: center;"><span style="font-size: 10px; font-weight: 700; color: #F7F3E8; background: #29251F; padding: 4px 10px; border-radius: 999px;">En venta · 10 celdas</span></div>
+          <div style="font-size: 15px; font-weight: 700; color: #29251F; line-height: 1.15; text-align: center;">Auriculares Bluetooth TWS</div>
+          <div class="mono" style="font-size: 12px; color: #29251F; text-align: center; margin-top: 6px;">#G3 · 40 celdas</div>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #DDD5C3;">Publicada a 9,50 HNY / celda</div>
+        <div class="key-actions">
+          <span class="btn" style="height: 36px; padding: 0 16px; border: 1.5px solid #DDD5C3; color: #F7F3E8; font-size: 13px;">Ver en el Mercado</span>
+          <span class="btn" style="height: 36px; padding: 0 16px; color: #A8A090; font-size: 13px;">Retirar oferta</span>
+        </div>
+      </div>
+
+      <div class="key" style="margin-top: 132px; opacity: 0.55;">
+        <div class="hex key-hex" style="background: #3B3733;">
+          <div style="position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: center;"><span class="mono" style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: #DDD5C3; background: #1C1C1A; padding: 4px 10px; border-radius: 999px;">HEXAKEY · ERC-1155</span></div>
+          <div style="position: absolute; top: 58px; left: 0; right: 0; display: flex; justify-content: center;"><span style="font-size: 10px; font-weight: 700; color: #F7F3E8; background: #68705A; padding: 4px 10px; border-radius: 999px;">Reclamada</span></div>
+          <div style="font-size: 15px; font-weight: 700; color: #DDD5C3; line-height: 1.15; text-align: center;">Café Tostado Molido 1kg</div>
+          <div class="mono" style="font-size: 12px; color: #DDD5C3; text-align: center; margin-top: 6px;">#G0 · 12 celdas</div>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #DDD5C3;">Producto retirado el 2 feb</div>
+        <div class="key-actions">
+          <span class="btn" style="height: 36px; padding: 0 16px; color: #A8A090; font-size: 13px;">Ver certificado</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+</body>
+</html>

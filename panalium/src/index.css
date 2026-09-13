@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+@import 'tailwindcss';
+
+/*
+ * Design tokens de Panalium. Todo color usado en la UI vive aquí y se expone
+ * como utilidad Tailwind (bg-card, text-muted-foreground, border-border, ...).
+ * Espejo en JS para estilos inline: `src/shared/config/theme.ts`.
+ */
+@theme {
+  /* Marca */
+  --color-carbon: #1C1C1A;
+  --color-cream: #F7F3E8;
+  --color-honey: #F2B705;
+  --color-honey-light: #F8D66D;
+  --color-olive: #68705A;
+  --color-brown: #29251F;
+  --color-beige: #DDD5C3;
+
+  /* Roles semánticos */
+  --color-background: #1C1C1A;
+  --color-sidebar: #1C1C1A;
+  --color-foreground: #F7F3E8;
+  --color-secondary-foreground: #DDD5C3;
+  --color-muted-foreground: #68705A;
+  --color-faint: #A8A090;
+
+  --color-card: #F7F3E8;
+  --color-card-foreground: #29251F;
+  --color-surface: #FFFFFF;
+  --color-elevated: #29251F;
+
+  --color-border: #DDD5C3;
+  --color-border-dark: #3B3733;
+
+  --color-primary: #F2B705;
+  --color-primary-hover: #F8D66D;
+  --color-primary-foreground: #29251F;
+  --color-accent: #68705A;
+  --color-accent-foreground: #F7F3E8;
+
+  --font-sans: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+.display {
+  font-family: var(--font-display);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* Hexágono de lados verticales: unidad visual de Panalium */
+.hex {
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark);
+  border-radius: 3px;
+}
+:hover::-webkit-scrollbar-thumb { background: var(--color-olive); }
+
+/* Navegación lateral */
+.nav-item {
+  transition: background-color 0.15s, color 0.15s;
+}
+.nav-item:hover {
+  background: rgba(247, 243, 232, 0.06);
+  color: var(--color-foreground);
+}
+.nav-item-active,
+.nav-item-active:hover {
+  background: var(--color-elevated);
+  color: var(--color-honey-light);
+}
+
+/* Tarjetas interactivas */
+.card-hover {
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card-hover:hover {
+  border-color: var(--color-brown);
+  transform: translateY(-1px);
+}
+
+/* Foco en campos */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--color-honey) !important;
+  box-shadow: 0 0 0 3px var(--color-honey-light);
+}
+
+/* Barra de llenado de miel */
+.progress-bar {
+  height: 8px;
+  background: var(--color-beige);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--color-honey);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+.progress-fill-complete {
+  background: var(--color-olive);
+}
+
+/* Etiqueta pequeña en mayúsculas (campos, tarjetas de estadísticas) */
+.label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--color-olive);
+}

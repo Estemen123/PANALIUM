@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; background: #1C1C1A; color: #F7F3E8; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #F2B705; } a:hover { color: #F8D66D; }
+    .display { font-family: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+    .hex { clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%); }
+    .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: #68705A; }
+    .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 12px; color: #DDD5C3; font-size: 14px; font-weight: 600; }
+    .nav-active { background: #29251F; color: #F8D66D; }
+    .card { background: #F7F3E8; color: #29251F; border-radius: 16px; border: 1px solid #DDD5C3; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-radius: 12px; white-space: nowrap; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; display: flex; background: #1C1C1A; overflow: hidden;">
+
+  <!-- Sidebar -->
+  <aside style="width: 248px; flex-shrink: 0; border-right: 1px solid #3B3733; display: flex; flex-direction: column; padding: 24px 16px; box-sizing: border-box; gap: 24px;">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 0 8px;">
+      <div class="hex" style="width: 40px; height: 44px; background: #F2B705; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#29251F" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 4v10l-7 4-7-4V7z"></path></svg></div>
+      <div><div class="display" style="font-size: 20px; font-weight: 800; line-height: 1;">Panalium</div><div style="font-size: 11px; color: #DDD5C3; margin-top: 4px;">Colmena Web3</div></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #29251F; border-radius: 14px;">
+      <div class="hex" style="width: 40px; height: 44px; background: #F2B705; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #29251F;">L</div>
+      <div style="min-width: 0;"><div style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Luisa Torres</div><div style="font-size: 11px; color: #F8D66D; font-weight: 600;">Abeja verificada</div></div>
+    </div>
+    <nav style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
+      <div class="nav-item nav-active"><span class="hex" style="width: 12px; height: 13px; background: #F2B705;"></span>Mi Colmena</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Reserva de Honey</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Panales</div>
+      <div class="nav-item" style="padding-left: 36px; color: #A8A090;">Mis Panales</div>
+      <div class="nav-item" style="padding-left: 36px; color: #A8A090;">Fundar un Panal</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Mis Recibos NFT</div>
+      <div class="nav-item"><span class="hex" style="width: 12px; height: 13px; background: transparent;"></span>Mercado de Abejas</div>
+    </nav>
+    <div style="padding: 14px; border: 1px solid #3B3733; border-radius: 14px; display: flex; flex-direction: column; gap: 4px;">
+      <div class="label" style="color: #DDD5C3;">Reserva de Honey</div>
+      <div class="mono" style="font-size: 18px; font-weight: 600; color: #F8D66D;">2.450,00 <span style="font-size: 12px; color: #DDD5C3;">HNY</span></div>
+    </div>
+    <div style="font-size: 13px; color: #A8A090; padding: 0 12px;">Salir de la colmena</div>
+  </aside>
+
+  <!-- Main -->
+  <main style="flex-grow: 1; padding: 40px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; overflow: hidden;">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+      <div>
+        <div class="display" style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05;">¡Bzz! Bienvenida de vuelta, Luisa</div>
+        <div style="font-size: 14px; color: #DDD5C3; margin-top: 8px;">Así está tu colmena hoy. Tienes 4 Panales recolectando y 1 Hexakey lista para reclamar.</div>
+      </div>
+      <span class="btn" style="height: 44px; padding: 0 20px; background: #F2B705; color: #29251F; font-size: 14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Fundar un Panal</span>
+    </div>
+
+    <!-- Row 1: Honey + stats -->
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 16px;">
+      <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="label">Reserva de Honey</div>
+          <div class="hex" style="width: 28px; height: 31px; background: #F2B705;"></div>
+        </div>
+        <div class="mono" style="font-size: 38px; font-weight: 600; line-height: 1;">2.450,00 <span style="font-size: 16px; color: #68705A;">HNY</span></div>
+        <div style="font-size: 12px; color: #68705A;">≈ 2.450 USDT · 85.000 BS en tokens de recompensa</div>
+        <div style="display: flex; gap: 8px;">
+          <span class="btn" style="height: 36px; padding: 0 14px; background: #29251F; color: #F8D66D; font-size: 13px;">Enviar Honey</span>
+          <span class="btn" style="height: 36px; padding: 0 14px; border: 1.5px solid #29251F; color: #29251F; font-size: 13px;">Recibir</span>
+        </div>
+      </div>
+      <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="label">Panales activos</div>
+        <div class="mono" style="font-size: 34px; font-weight: 600;">4</div>
+        <div style="font-size: 12px; color: #68705A;">3 recolectando · 1 lleno</div>
+      </div>
+      <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="label">Celdas comprometidas</div>
+        <div class="mono" style="font-size: 34px; font-weight: 600;">75</div>
+        <div style="font-size: 12px; color: #68705A;">437,50 HNY aportados</div>
+      </div>
+      <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="label">Hexakeys</div>
+        <div class="mono" style="font-size: 34px; font-weight: 600;">2</div>
+        <div style="font-size: 12px; color: #68705A;">1 lista para reclamar</div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; flex-grow: 1; min-height: 0;">
+
+      <!-- Panales activos -->
+      <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="display" style="font-size: 20px; font-weight: 700;">Tus Panales activos</div>
+          <span style="font-size: 13px; font-weight: 700; color: #68705A;">Ver todos</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid #DDD5C3; border-radius: 14px; background: #FFFFFF;">
+            <div class="hex" style="width: 52px; height: 58px; background: #68705A; flex-shrink: 0;"></div>
+            <div style="flex-grow: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 14px; font-weight: 700;">Aceite de Oliva Extra Virgen 1L</span><span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #F8D66D;">Recolectando</span></div>
+              <div style="height: 8px; background: #DDD5C3; border-radius: 999px; overflow: hidden;"><div style="width: 73%; height: 100%; background: #F2B705;"></div></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: #68705A;"><span>Enjambre Norte · tu aporte 25 celdas</span><span class="mono">73 / 100 celdas</span></div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid #DDD5C3; border-radius: 14px; background: #FFFFFF;">
+            <div class="hex" style="width: 52px; height: 58px; background: #DDD5C3; flex-shrink: 0;"></div>
+            <div style="flex-grow: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 14px; font-weight: 700;">Papel Higiénico Doble Hoja x48</span><span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #68705A; color: #F7F3E8;">Panal lleno</span></div>
+              <div style="height: 8px; background: #DDD5C3; border-radius: 999px; overflow: hidden;"><div style="width: 100%; height: 100%; background: #68705A;"></div></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: #68705A;"><span>Enjambre Centro · fundaste este Panal</span><span class="mono">50 / 50 celdas</span></div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid #DDD5C3; border-radius: 14px; background: #FFFFFF;">
+            <div class="hex" style="width: 52px; height: 58px; background: #29251F; flex-shrink: 0;"></div>
+            <div style="flex-grow: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 14px; font-weight: 700;">Auriculares Bluetooth TWS <span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #29251F; color: #F8D66D; margin-left: 6px;">Importación</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #F2B705;">Néctar enviado</span></div>
+              <div style="height: 8px; background: #DDD5C3; border-radius: 999px; overflow: hidden;"><div style="width: 60%; height: 100%; background: #F2B705;"></div></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: #68705A;"><span>Hexakey emitida · llega el 20 mar</span><span class="mono">120 / 200 celdas</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tu Enjambre -->
+      <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; background: #29251F; color: #F7F3E8; border-color: #68705A;">
+        <div>
+          <div class="label" style="color: #F8D66D;">Tu Enjambre</div>
+          <div class="display" style="font-size: 20px; font-weight: 700; margin-top: 4px;">Enjambre Norte</div>
+          <div style="font-size: 13px; color: #DDD5C3;">Panal: Aceite de Oliva Extra Virgen 1L</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="display: flex;">
+            <div class="hex" style="width: 34px; height: 38px; background: #F2B705; color: #29251F; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;">L</div>
+            <div class="hex" style="width: 34px; height: 38px; background: #F8D66D; color: #29251F; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -10px;">C</div>
+            <div class="hex" style="width: 34px; height: 38px; background: #68705A; color: #F7F3E8; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -10px;">R</div>
+            <div class="hex" style="width: 34px; height: 38px; background: #DDD5C3; color: #29251F; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -10px;">M</div>
+            <div class="hex" style="width: 34px; height: 38px; background: #F7F3E8; color: #29251F; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-left: -10px;">A</div>
+          </div>
+          <div style="font-size: 13px; color: #DDD5C3;">5 Abejas · eres la 2ª en unirte</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+          <div style="padding: 12px; border: 1px solid #68705A; border-radius: 12px;"><div class="label" style="color: #DDD5C3;">Tu aporte</div><div class="mono" style="font-size: 18px; font-weight: 600; margin-top: 4px;">25 <span style="font-size: 12px; color: #DDD5C3;">celdas</span></div><div style="font-size: 12px; color: #DDD5C3;">112,50 HNY</div></div>
+          <div style="padding: 12px; border: 1px solid #68705A; border-radius: 12px;"><div class="label" style="color: #DDD5C3;">Estado</div><div style="font-size: 14px; font-weight: 700; margin-top: 6px; color: #F8D66D;">Recolectando</div><div style="font-size: 12px; color: #DDD5C3;">Cierra el 15 feb</div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #DDD5C3; margin-bottom: 8px;"><span>Celdas del Enjambre</span><span class="mono">7 / 10</span></div>
+          <div style="display: flex; gap: 4px;">
+            <div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #F2B705;"></div><div class="hex" style="width: 24px; height: 27px; background: #68705A;"></div><div class="hex" style="width: 24px; height: 27px; background: #68705A;"></div><div class="hex" style="width: 24px; height: 27px; background: #68705A;"></div>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: #DDD5C3; line-height: 1.5; margin-top: auto;">Faltan 27 celdas para llenar el Panal. Invita a otra Abeja y el Enjambre se completa antes.</div>
+        <span class="btn" style="height: 44px; border: 1.5px solid #DDD5C3; color: #F7F3E8; font-size: 14px;">Ver el Panal completo</span>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+</body>
+</html>

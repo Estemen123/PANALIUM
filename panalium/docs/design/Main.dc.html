@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; background: #1C1C1A; color: #F7F3E8; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #F2B705; } a:hover { color: #F8D66D; }
+    .display { font-family: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+    .hex { clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%); }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #DDD5C3; font-size: 14px; vertical-align: top; }
+    th { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #68705A; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; min-height: 1000px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; gap: 40px; background: #1C1C1A;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div class="hex" style="width: 56px; height: 56px; background: #F2B705; display: flex; align-items: center; justify-content: center;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#29251F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v10l-7 4-7-4V7z"></path><path d="M12 3v18M5 7l14 10M19 7L5 17"></path></svg>
+      </div>
+      <div>
+        <div class="display" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1;">Panalium</div>
+        <div style="font-size: 13px; color: #DDD5C3; margin-top: 6px;">Compras grupales Web3 · Arquitectura de información y rediseño UI/UX</div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <span style="font-size: 12px; font-weight: 600; padding: 8px 14px; border: 1px solid #DDD5C3; border-radius: 999px; color: #DDD5C3;">Versión 1 · Wireframes</span>
+      <span style="font-size: 12px; font-weight: 600; padding: 8px 14px; background: #F2B705; color: #29251F; border-radius: 999px;">Escritorio 1440</span>
+    </div>
+  </div>
+
+  <!-- Two columns: glossary + sitemap -->
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px;">
+
+    <!-- Glossary -->
+    <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 28px 28px 8px;">
+      <div class="display" style="font-size: 22px; font-weight: 700; margin-bottom: 4px;">Glosario del sistema</div>
+      <div style="font-size: 13px; color: #68705A; margin-bottom: 18px;">Términos obligatorios en toda la interfaz. La columna izquierda es el concepto actual del producto.</div>
+      <table>
+        <tr><th>Concepto</th><th>Término Panalium</th><th>Uso en UI</th></tr>
+        <tr><td>Plataforma</td><td class="display" style="font-weight: 700;">Panalium</td><td>Logo, título de pestaña, pie de página</td></tr>
+        <tr><td>Usuario / cuenta</td><td class="display" style="font-weight: 700;">Abeja</td><td>"Perfil de la Abeja", "12 Abejas en este Panal"</td></tr>
+        <tr><td>Grupo de compra</td><td class="display" style="font-weight: 700;">Panal · Panales</td><td>Sección principal, tarjetas, "Fundar un Panal"</td></tr>
+        <tr><td>Subgrupo dentro del Panal</td><td class="display" style="font-weight: 700;">Enjambre</td><td>Distribución de Abejas por lote o zona de retiro</td></tr>
+        <tr><td>Moneda de la plataforma</td><td class="display" style="font-weight: 700;">Honey</td><td>Saldos, precios y totales. Formato: <span class="mono">1.250,00 HNY</span></td></tr>
+        <tr><td>Token ERC-1155 (recibo)</td><td class="display" style="font-weight: 700;">Hexakey</td><td>Sección "Mis Recibos NFT", tarjetas hexagonales</td></tr>
+        <tr><td>Mercado secundario</td><td class="display" style="font-weight: 700;">Mercado de Abejas</td><td>Compra y venta de Hexakeys entre Abejas</td></tr>
+        <tr><td>Unidad comprometida</td><td class="display" style="font-weight: 700;">Celda</td><td>Progreso del Panal: "146 / 200 celdas llenas"</td></tr>
+      </table>
+    </div>
+
+    <!-- Sitemap -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 28px;">
+        <div class="display" style="font-size: 22px; font-weight: 700; margin-bottom: 4px;">Mapa de navegación · Abeja</div>
+        <div style="font-size: 13px; color: #68705A; margin-bottom: 20px;">Barra lateral fija. Orden por frecuencia de uso: primero lo que se consulta a diario.</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;"><span class="hex" style="width: 28px; height: 28px; background: #F2B705; display: inline-block;"></span><span style="font-weight: 700;">Mi Colmena</span><span style="font-size: 12px; color: #68705A;">Dashboard: saldo Honey, Panales activos, estado en el Enjambre</span></div>
+          <div style="display: flex; align-items: center; gap: 12px;"><span class="hex" style="width: 28px; height: 28px; background: #F8D66D; display: inline-block;"></span><span style="font-weight: 700;">Reserva de Honey</span><span style="font-size: 12px; color: #68705A;">Billetera: dirección, saldo, movimientos</span></div>
+          <div style="display: flex; align-items: center; gap: 12px;"><span class="hex" style="width: 28px; height: 28px; background: #F8D66D; display: inline-block;"></span><span style="font-weight: 700;">Panales</span><span style="font-size: 12px; color: #68705A;">Explorar Panales abiertos · detalle con Enjambres · unirse</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding-left: 40px;"><span style="width: 8px; height: 8px; background: #68705A; border-radius: 999px; display: inline-block;"></span><span style="font-weight: 600;">Mis Panales</span><span style="font-size: 12px; color: #68705A;">Los que fundé o donde participo</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding-left: 40px;"><span style="width: 8px; height: 8px; background: #68705A; border-radius: 999px; display: inline-block;"></span><span style="font-weight: 600;">Fundar un Panal</span><span style="font-size: 12px; color: #68705A;">Local o importación</span></div>
+          <div style="display: flex; align-items: center; gap: 12px;"><span class="hex" style="width: 28px; height: 28px; background: #F8D66D; display: inline-block;"></span><span style="font-weight: 700;">Mis Recibos NFT</span><span style="font-size: 12px; color: #68705A;">Galería de Hexakeys · reclamar · vender</span></div>
+          <div style="display: flex; align-items: center; gap: 12px;"><span class="hex" style="width: 28px; height: 28px; background: #F8D66D; display: inline-block;"></span><span style="font-weight: 700;">Mercado de Abejas</span><span style="font-size: 12px; color: #68705A;">Comprar y vender Hexakeys</span></div>
+        </div>
+      </div>
+
+      <div style="background: #29251F; border: 1px solid #68705A; border-radius: 20px; padding: 24px 28px;">
+        <div class="display" style="font-size: 18px; font-weight: 700; margin-bottom: 12px; color: #F8D66D;">Recorrido principal de una Abeja</div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; font-weight: 600;">
+          <span style="padding: 8px 12px; background: #F7F3E8; color: #29251F; border-radius: 10px;">Entra a la colmena</span>
+          <span style="color: #F2B705;">→</span>
+          <span style="padding: 8px 12px; background: #F7F3E8; color: #29251F; border-radius: 10px;">Explora Panales</span>
+          <span style="color: #F2B705;">→</span>
+          <span style="padding: 8px 12px; background: #F7F3E8; color: #29251F; border-radius: 10px;">Se une a un Enjambre</span>
+          <span style="color: #F2B705;">→</span>
+          <span style="padding: 8px 12px; background: #F7F3E8; color: #29251F; border-radius: 10px;">El Panal se llena y paga</span>
+          <span style="color: #F2B705;">→</span>
+          <span style="padding: 8px 12px; background: #F2B705; color: #29251F; border-radius: 10px;">Recibe su Hexakey</span>
+          <span style="color: #F2B705;">→</span>
+          <span style="padding: 8px 12px; background: #F7F3E8; color: #29251F; border-radius: 10px;">Reclama o vende en el Mercado de Abejas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Principles -->
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px;">
+    <div style="border: 1px solid #68705A; border-radius: 16px; padding: 20px;">
+      <div class="display" style="font-size: 16px; font-weight: 700; color: #F8D66D; margin-bottom: 6px;">Hexágono como unidad</div>
+      <div style="font-size: 13px; color: #DDD5C3; line-height: 1.5;">Avatares, Hexakeys, marcadores de estado y celdas de progreso usan el hexágono. Las tarjetas de contenido siguen siendo rectangulares con radio 16 px para no sacrificar legibilidad.</div>
+    </div>
+    <div style="border: 1px solid #68705A; border-radius: 16px; padding: 20px;">
+      <div class="display" style="font-size: 16px; font-weight: 700; color: #F8D66D; margin-bottom: 6px;">Carbón + crema</div>
+      <div style="font-size: 13px; color: #DDD5C3; line-height: 1.5;">El lienzo es negro carbón; el contenido vive en superficies crema con texto marrón. El amarillo miel se reserva para la acción principal y el progreso.</div>
+    </div>
+    <div style="border: 1px solid #68705A; border-radius: 16px; padding: 20px;">
+      <div class="display" style="font-size: 16px; font-weight: 700; color: #F8D66D; margin-bottom: 6px;">Progreso = llenado de miel</div>
+      <div style="font-size: 13px; color: #DDD5C3; line-height: 1.5;">Cada Panal muestra cuántas celdas están llenas. La barra se rellena de miel de izquierda a derecha y cambia a verde oliva cuando el Panal está completo.</div>
+    </div>
+    <div style="border: 1px solid #68705A; border-radius: 16px; padding: 20px;">
+      <div class="display" style="font-size: 16px; font-weight: 700; color: #F8D66D; margin-bottom: 6px;">Una acción por pantalla</div>
+      <div style="font-size: 13px; color: #DDD5C3; line-height: 1.5;">Cada vista tiene un único botón miel. Todo lo demás es secundario (contorno) o terciario (texto), para que la Abeja siempre sepa cuál es el siguiente paso.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

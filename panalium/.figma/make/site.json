@@ -1,0 +1,10 @@
+{
+  "description": "Facilitates group buying for consumers and wholesalers, enabling users to create product groups, manage transactions, and access multiple marketplaces.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

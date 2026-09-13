@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; background: #1C1C1A; color: #F7F3E8; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #F2B705; } a:hover { color: #F8D66D; }
+    .display { font-family: 'Bricolage Grotesque', 'Manrope', 'Segoe UI', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+    .block { background: #F7F3E8; color: #29251F; border-radius: 20px; padding: 24px 26px 10px; }
+    .block h2 { font-family: 'Bricolage Grotesque', 'Manrope', sans-serif; font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .block p { font-size: 13px; color: #68705A; margin: 0 0 14px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #DDD5C3; font-size: 13px; vertical-align: top; line-height: 1.45; }
+    th { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #68705A; }
+    td.k { width: 38%; color: #68705A; }
+    td.v { font-weight: 600; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; min-height: 1460px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; gap: 28px; background: #1C1C1A;">
+
+  <div>
+    <div class="display" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em;">Micro-copy de la colmena</div>
+    <div style="font-size: 14px; color: #DDD5C3; margin-top: 6px;">Textos de interfaz listos para usar. Tono: cercano, breve, en segunda persona. La metáfora aparece en verbos y nombres, nunca en el dato duro (cifras, fechas, direcciones).</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div class="block">
+        <h2>Navegación y acceso</h2>
+        <p>Etiquetas de menú y pantalla de entrada.</p>
+        <table>
+          <tr><th>Dónde</th><th>Texto</th></tr>
+          <tr><td class="k">Menú · dashboard</td><td class="v">Mi Colmena</td></tr>
+          <tr><td class="k">Menú · billetera</td><td class="v">Reserva de Honey</td></tr>
+          <tr><td class="k">Menú · grupos</td><td class="v">Panales · Mis Panales · Fundar un Panal</td></tr>
+          <tr><td class="k">Menú · NFT</td><td class="v">Mis Recibos NFT</td></tr>
+          <tr><td class="k">Menú · secundario</td><td class="v">Mercado de Abejas</td></tr>
+          <tr><td class="k">Botón de acceso</td><td class="v">Entrar a la colmena</td></tr>
+          <tr><td class="k">Botón de registro</td><td class="v">Registrar una nueva Abeja</td></tr>
+          <tr><td class="k">Nota de registro</td><td class="v">Al registrarte creamos tu billetera Web3. Tu número de celular es único: una Abeja, una cuenta.</td></tr>
+          <tr><td class="k">Cerrar sesión</td><td class="v">Salir de la colmena</td></tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <h2>Mi Colmena y Reserva de Honey</h2>
+        <p>Saludo, saldo y acciones de billetera.</p>
+        <table>
+          <tr><th>Dónde</th><th>Texto</th></tr>
+          <tr><td class="k">Saludo</td><td class="v">¡Bzz! Bienvenida de vuelta, {nombre}</td></tr>
+          <tr><td class="k">Subtítulo de estado</td><td class="v">Tienes {n} Panales recolectando y {m} Hexakey lista para reclamar.</td></tr>
+          <tr><td class="k">Tarjeta de saldo</td><td class="v">Reserva de Honey · {monto} HNY</td></tr>
+          <tr><td class="k">Acciones de billetera</td><td class="v">Enviar Honey · Recibir · Movimientos de la colmena</td></tr>
+          <tr><td class="k">Dirección copiada</td><td class="v">Dirección copiada. Comparte tu celda con quien quiera enviarte Honey.</td></tr>
+          <tr><td class="k">Tu Enjambre (tarjeta)</td><td class="v">Faltan {n} celdas para llenar el Panal. Invita a otra Abeja y el Enjambre se completa antes.</td></tr>
+          <tr><td class="k">Sin Panales</td><td class="v">Aún no tienes Panales. Toda colmena empieza con una Abeja: funda el primero o únete a uno abierto.</td></tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <h2>Estados de un Panal</h2>
+        <p>Equivalencia con los estados actuales del sistema.</p>
+        <table>
+          <tr><th>Estado actual</th><th>Etiqueta Panalium</th></tr>
+          <tr><td class="k">open</td><td class="v">Recolectando</td></tr>
+          <tr><td class="k">funded</td><td class="v">Panal lleno</td></tr>
+          <tr><td class="k">paid_to_supplier</td><td class="v">Néctar enviado</td></tr>
+          <tr><td class="k">closed</td><td class="v">Sellado</td></tr>
+          <tr><td class="k">cancelled</td><td class="v">Panal disuelto</td></tr>
+          <tr><td class="k">Hexakey · held / listed / burned</td><td class="v">En custodia · En venta · Reclamada</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div class="block">
+        <h2>Panales y Enjambres</h2>
+        <p>Explorar, unirse y fundar.</p>
+        <table>
+          <tr><th>Dónde</th><th>Texto</th></tr>
+          <tr><td class="k">Cabecera</td><td class="v">Únete a un Panal abierto o funda el tuyo. Cada Panal se divide en Enjambres para organizar el retiro.</td></tr>
+          <tr><td class="k">Progreso</td><td class="v">{x} / {y} celdas · faltan {z}</td></tr>
+          <tr><td class="k">Botón principal</td><td class="v">Unirme al Enjambre {nombre} · {monto} HNY</td></tr>
+          <tr><td class="k">Nota de depósito</td><td class="v">Cada celda son {precio} HNY. Si el Panal no se llena antes del cierre, tu Honey vuelve a tu reserva.</td></tr>
+          <tr><td class="k">Ya eres miembro</td><td class="v">Ya vuelas en este Panal. Tu aporte: {n} celdas.</td></tr>
+          <tr><td class="k">Enjambre lleno</td><td class="v">Este Enjambre está completo. Elige otro punto de retiro.</td></tr>
+          <tr><td class="k">Fundar · título</td><td class="v">Fundar un Panal</td></tr>
+          <tr><td class="k">Fundar · importación</td><td class="v">Panal de importación: incluye envío y aduana en el precio por celda. El depósito protege a todas las Abejas.</td></tr>
+          <tr><td class="k">Éxito al fundar</td><td class="v">Tu Panal está abierto. Ahora a reunir Abejas.</td></tr>
+          <tr><td class="k">Éxito al unirse</td><td class="v">Te uniste al Enjambre. ¡A recolectar!</td></tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <h2>Hexakeys y Mercado de Abejas</h2>
+        <p>Recibos NFT, reclamo y comercio entre Abejas.</p>
+        <table>
+          <tr><th>Dónde</th><th>Texto</th></tr>
+          <tr><td class="k">Explicación</td><td class="v">Una Hexakey es la llave de tu compra: un token ERC-1155 con tus celdas del Panal. Reclámala al llegar el producto o véndela si necesitas Honey antes.</td></tr>
+          <tr><td class="k">Acciones</td><td class="v">Reclamar · Vender · Ver en el Mercado · Retirar oferta</td></tr>
+          <tr><td class="k">Confirmar reclamo</td><td class="v">Al reclamar, tu Hexakey se quema y el producto queda listo para retiro en tu Enjambre. No se puede deshacer.</td></tr>
+          <tr><td class="k">Reclamo hecho</td><td class="v">Producto reclamado. Tu Hexakey pasó a la historia de la colmena.</td></tr>
+          <tr><td class="k">Publicar venta</td><td class="v">Publicar en el Mercado de Abejas</td></tr>
+          <tr><td class="k">Venta publicada</td><td class="v">Tu Hexakey ya está en el Mercado de Abejas.</td></tr>
+          <tr><td class="k">Comprar</td><td class="v">Comprar Hexakey · Confirmar compra · {total} HNY</td></tr>
+          <tr><td class="k">Compra hecha</td><td class="v">Compra completada. La Hexakey ya vuela hacia tu billetera.</td></tr>
+          <tr><td class="k">Sin Hexakeys</td><td class="v">Tus Hexakeys aparecerán aquí cuando un Panal tuyo envíe el néctar al proveedor.</td></tr>
+          <tr><td class="k">Mercado vacío</td><td class="v">El Mercado está tranquilo. Ninguna Abeja vende Hexakeys ahora mismo.</td></tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <h2>Errores y avisos</h2>
+        <p>Cortos, con la causa y el siguiente paso.</p>
+        <table>
+          <tr><th>Caso</th><th>Texto</th></tr>
+          <tr><td class="k">Saldo insuficiente</td><td class="v">No hay suficiente Honey en tu reserva. Te faltan {n} HNY.</td></tr>
+          <tr><td class="k">Celdas excedidas</td><td class="v">Solo quedan {n} celdas disponibles en esta oferta.</td></tr>
+          <tr><td class="k">Correo no encontrado</td><td class="v">No encontramos esa Abeja. Revisa el correo o registra una nueva.</td></tr>
+          <tr><td class="k">Correo duplicado</td><td class="v">Ya existe una Abeja con ese correo.</td></tr>
+          <tr><td class="k">Panal cerrado</td><td class="v">Este Panal ya está sellado. Busca otro que siga recolectando.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

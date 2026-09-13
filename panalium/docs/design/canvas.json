@@ -1,0 +1,16 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Arquitectura de información", "x": 0, "y": 0, "w": 1440, "h": 1100 },
+    { "file": "SistemaDeDiseno.dc.html", "title": "Sistema de diseño", "x": 1540, "y": 0, "w": 1440, "h": 1800 },
+    { "file": "MiColmena.dc.html", "title": "Mi Colmena (Dashboard)", "x": 0, "y": 1940, "w": 1440, "h": 900 },
+    { "file": "Panales.dc.html", "title": "Panales y Enjambres", "x": 1540, "y": 1940, "w": 1440, "h": 900 },
+    { "file": "MisRecibosNFT.dc.html", "title": "Mis Recibos NFT (Hexakeys)", "x": 0, "y": 2980, "w": 1440, "h": 900 },
+    { "file": "MercadoDeAbejas.dc.html", "title": "Mercado de Abejas", "x": 1540, "y": 2980, "w": 1440, "h": 900 },
+    { "file": "MicroCopy.dc.html", "title": "Micro-copy", "x": 0, "y": 4020, "w": 1440, "h": 1960 }
+  ],
+  "annotations": [
+    { "id": "nota-lectura", "x": 0, "y": -150, "w": 620, "text": "Panalium · rediseño UI/UX\nFila 1: arquitectura de información y sistema de diseño.\nFila 2 y 3: las cuatro pantallas pedidas (escritorio 1440).\nFila 4: micro-copy.\nPersona demo: Luisa Torres, Abeja verificada." },
+    { "id": "nota-enjambre", "x": 1540, "y": 2880, "w": 420, "text": "Supuesto: un Enjambre es un subgrupo del Panal ligado a un punto de retiro. Si el criterio real es otro (lote, fecha, tipo de Abeja), cambia solo la etiqueta gris bajo cada nombre de Enjambre." }
+  ],
+  "launch": { "view": "canvas" }
+}
