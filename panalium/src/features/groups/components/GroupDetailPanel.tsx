@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Badge, Card, Progress } from "@/shared/ui"
+import { Card, Progress } from "@/shared/ui"
 import { Icon } from "@/shared/icons/Icon"
 import { formatPrice } from "@/shared/lib/format"
 import {
@@ -17,6 +17,8 @@ import {
 import GroupStatusBadges from "./GroupStatusBadges"
 import SwarmRow from "./SwarmRow"
 import JoinBar from "./JoinBar"
+import PanalStageCard from "./PanalStageCard"
+import BuyMoreCellsButton from "./BuyMoreCellsButton"
 import { useAdvancePercent } from "../hooks/useGroups"
 
 export interface GroupDetailPanelProps {
@@ -47,7 +49,9 @@ export default function GroupDetailPanel({
     : 0
   const details = [
     `Fundado por ${group.creatorName}`,
-    `Adelanto ${advancePercent}% al reservar`,
+    group.finalUnitPrice != null
+      ? `Precio final ${formatPrice(group.finalUnitPrice, group.currency, 2)} ${group.currency}`
+      : `Adelanto ${advancePercent}% al reservar`,
     group.deadline ? `Cierra el ${group.deadline}` : null,
   ].filter(Boolean)
 
@@ -79,6 +83,16 @@ export default function GroupDetailPanel({
           <Icon.link /> Ver producto en el proveedor
         </a>
       )}
+      {group.exakeysExplorerUrl && (
+        <a
+          href={group.exakeysExplorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-olive hover:text-brown"
+        >
+          <Icon.link /> Ver Hexakeys en HashKey Chain
+        </a>
+      )}
       {group.explorerUrl && (
         <a
           href={group.explorerUrl}
@@ -105,6 +119,8 @@ export default function GroupDetailPanel({
         />
       </div>
 
+      <PanalStageCard group={group} user={user} />
+
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <h3 className="display text-base font-bold">
@@ -130,9 +146,9 @@ export default function GroupDetailPanel({
           <Icon.check /> Ya vuelas en este Panal. Tu aporte: {entry.units}{" "}
           celdas en {mySwarm?.name ?? "tu Enjambre"}.
           {group.status === "open" && (
-            <Badge variant="light" className="ml-auto">
-              Recolectando
-            </Badge>
+            <div className="ml-auto">
+              <BuyMoreCellsButton group={group} userId={user.id} size="sm" />
+            </div>
           )}
         </div>
       )}

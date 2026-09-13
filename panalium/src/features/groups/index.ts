@@ -9,4 +9,11 @@ export {
   default as GroupStatusBadges,
   GroupStatusBadge,
 } from "./components/GroupStatusBadges"
-export { useGroups, useMyGroups, useGroupActions } from "./hooks/useGroups"
+export { default as PanalAdminModal } from "./components/PanalAdminModal"
+export {
+  useGroups,
+  useMyGroups,
+  useGroupActions,
+  useAdminPanalActions,
+  usePanalConfig,
+} from "./hooks/useGroups"

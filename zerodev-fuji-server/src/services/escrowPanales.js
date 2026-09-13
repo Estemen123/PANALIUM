@@ -1,35 +1,43 @@
 import { readFileSync } from 'node:fs';
-import { BaseError, ContractFunctionRevertedError, decodeErrorResult, erc20Abi, formatUnits } from 'viem';
-import { publicClient } from '../config/chain.js';
+import { erc20Abi, formatUnits } from 'viem';
+import { explorerTxUrl, fujiTransport, publicClient } from '../config/chain.js';
 import { env } from '../config/env.js';
 import { HttpError } from '../middleware/errors.js';
+import { toHttpError } from './contractErrors.js';
+import { writeAsMaster } from './masterWallet.js';
 import { getSmartAccountAddress } from './smartAccount.js';
 import { sendBatch } from './wallet.js';
 
 /**
  * Contrato EscrowPanales desplegado en Fuji (CONTRATO_AVALANCH).
  *
- * Crear un Panal y unirse los firma la smart account (ZeroDev Kernel) del usuario autenticado:
- * el contrato cobra el adelanto a quien llama con transferFrom, asi que cada operacion va en una
- * sola UserOp patrocinada por el paymaster de ZeroDev: approve(USDC -> escrow) + la llamada.
+ * - Las Abejas operan desde su smart account (ZeroDev Kernel) con UserOps patrocinadas por el paymaster.
+ *   Todo lo que cobra USDC va en una sola UserOp: approve(USDC -> escrow) + la llamada.
+ * - Las transiciones de etapa (cotizacion, recoleccion, liberar, sellar, cancelar) son onlyOwner:
+ *   las firma la wallet master.
+ *
+ * Maquina de estados (verificada contra el contrato desplegado):
+ *   0 Reservando   crearPanal / unirseAlPanal (adelanto) / salirDelPanal (devuelve lo pagado)
+ *   1 Cotizando    iniciarCotizacion (exige el minimo reservado); nadie mas entra
+ *   2 Recolectando abrirRecoleccion(precioFinal, fin): pagarSaldo, unirseAlPanalConPagoCompleto
+ *   3 Liberado     liberarFondos tras vencer el plazo y con el minimo pagado: USDC -> tesoreria
+ *   4 Sellado      sellarPanal; quien no pago recupera su adelanto con reembolsar
+ *   5 Cancelado    cancelarPanal; todos recuperan lo pagado con reembolsar
  */
 export const escrowAbi = JSON.parse(
   readFileSync(new URL('../../ABIS/EscrowPanales.abi.json', import.meta.url), 'utf8'),
 );
 
-/** Mensajes legibles para los custom errors del contrato. */
-const REVERT_MESSAGES = {
-  PanalYaExiste: 'Ya existe un Panal con ese identificador en el contrato',
-  PanalIdInvalido: 'Identificador de Panal invalido',
-  CantidadInvalida: 'Las cantidades y el precio deben ser mayores a 0',
-  ObjetivoMenorAlMinimo: 'La cantidad objetivo no puede ser menor a la minima',
-  PlazoInvalido: 'La fecha de cierre debe ser futura',
-  PanalNoExiste: 'El Panal no existe en el contrato',
-  AbejaYaParticipa: 'Ya reservaste celdas en este Panal',
-  PanalLleno: 'No quedan tantas celdas libres en este Panal',
-  PlazoFinalizado: 'El plazo de reservas de este Panal ya termino',
-  EstadoInvalido: 'El Panal ya no acepta reservas',
-};
+export const ESTADO = Object.freeze({
+  RESERVANDO: 0,
+  COTIZANDO: 1,
+  RECOLECTANDO: 2,
+  LIBERADO: 3,
+  SELLADO: 4,
+  CANCELADO: 5,
+});
+
+const toUsdc = (raw) => Number(formatUnits(raw, env.USDC_TOKEN_DECIMALS));
 
 function assertConfigured() {
   if (!env.CONTRATO_AVALANCH || !env.USDC_TOKEN_ADDRESS) {
@@ -40,38 +48,10 @@ function assertConfigured() {
   }
 }
 
-/**
- * Traduce un revert a HttpError. Con UserOps el bundler no devuelve un ContractFunctionRevertedError
- * sino el texto "UserOperation reverted during simulation with reason: 0x...": decodificamos ese hex.
- */
-function toHttpError(err) {
-  if (!(err instanceof BaseError)) return err;
-  let name = err.walk((e) => e instanceof ContractFunctionRevertedError)?.data?.errorName;
-  let reason;
-  if (!name) {
-    const hex = `${err.details ?? ''} ${err.message}`.match(/reason:\s*"?(0x[0-9a-fA-F]{8,})/)?.[1];
-    if (hex) {
-      try {
-        const decoded = decodeErrorResult({ abi: escrowAbi, data: hex });
-        name = decoded.errorName;
-        if (name === 'Error') reason = String(decoded.args?.[0] ?? '');
-      } catch {
-        // Selector desconocido: dejamos el error original.
-      }
-    }
-  }
-  if (reason) {
-    const message = /allowance|balance/i.test(reason) ? `USDC insuficiente para el adelanto (${reason})` : reason;
-    return new HttpError(400, message, { code: 'contract_revert', details: reason });
-  }
-  if (name) {
-    return new HttpError(400, REVERT_MESSAGES[name] ?? `El contrato rechazo la operacion (${name})`, {
-      code: 'contract_revert',
-      details: name,
-    });
-  }
-  return err;
-}
+const read = (functionName, args = []) =>
+  publicClient.readContract({ address: env.CONTRATO_AVALANCH, abi: escrowAbi, functionName, args });
+
+/* ── Lecturas ─────────────────────────────────────────────────────────── */
 
 let porcentajeAdelanto;
 
@@ -79,10 +59,7 @@ let porcentajeAdelanto;
 export async function obtenerPorcentajeAdelanto() {
   assertConfigured();
   if (!porcentajeAdelanto) {
-    const [numerador, base] = await Promise.all([
-      publicClient.readContract({ address: env.CONTRATO_AVALANCH, abi: escrowAbi, functionName: 'PORCENTAJE_ADELANTO' }),
-      publicClient.readContract({ address: env.CONTRATO_AVALANCH, abi: escrowAbi, functionName: 'BASE_PORCENTAJES' }),
-    ]);
+    const [numerador, base] = await Promise.all([read('PORCENTAJE_ADELANTO'), read('BASE_PORCENTAJES')]);
     porcentajeAdelanto = { numerador, base };
   }
   return porcentajeAdelanto;
@@ -94,96 +71,9 @@ export async function estimarAdelanto(precioUnidadRaw, unidades) {
   return (BigInt(precioUnidadRaw) * BigInt(unidades) * numerador) / base;
 }
 
-/** Lanza 400 si la smart account de la Abeja no tiene USDC para cubrir el adelanto. */
-async function verificarSaldoAdelanto(uid, adelantoRaw) {
-  const address = await getSmartAccountAddress(uid);
-  const saldo = await publicClient.readContract({
-    address: env.USDC_TOKEN_ADDRESS,
-    abi: erc20Abi,
-    functionName: 'balanceOf',
-    args: [address],
-  });
-  if (saldo < adelantoRaw) {
-    const fmt = (v) => formatUnits(v, env.USDC_TOKEN_DECIMALS);
-    throw new HttpError(
-      400,
-      `Saldo insuficiente: el adelanto es ${fmt(adelantoRaw)} USDC y tu reserva tiene ${fmt(saldo)} USDC`,
-      { code: 'saldo_insuficiente' },
-    );
-  }
-  return address;
-}
-
-/** UserOp patrocinada desde la smart account del usuario: approve(adelanto) + llamada al escrow. */
-async function pagarAdelantoYLlamar(uid, adelanto, functionName, args) {
-  const wallet = await verificarSaldoAdelanto(uid, adelanto);
-
-  let result;
-  try {
-    result = await sendBatch(uid, {
-      calls: [
-        {
-          to: env.USDC_TOKEN_ADDRESS,
-          abi: erc20Abi,
-          functionName: 'approve',
-          args: [env.CONTRATO_AVALANCH, adelanto],
-        },
-        { to: env.CONTRATO_AVALANCH, abi: escrowAbi, functionName, args },
-      ],
-    });
-  } catch (err) {
-    throw toHttpError(err);
-  }
-  if (result.status !== 'success') {
-    throw new HttpError(502, `La operacion ${functionName} revirtio en el contrato`, {
-      code: 'tx_reverted',
-      details: result.transactionHash,
-    });
-  }
-
-  return {
-    wallet,
-    adelantoRaw: adelanto.toString(),
-    adelanto: Number(formatUnits(adelanto, env.USDC_TOKEN_DECIMALS)),
-    userOpHash: result.userOpHash,
-    transactionHash: result.transactionHash,
-    explorerUrl: result.explorerUrl,
-  };
-}
-
-/**
- * El usuario autenticado funda el Panal y reserva sus celdas en la misma UserOp:
- * crearPanal(panalId, precioEstimadoUnidad, minimoUnidades, objetivoUnidades, finReservas, unidadesCreador)
- * El contrato cobra al creador el adelanto (40%) de `unidadesCreador`.
- */
-export async function crearPanal(uid, { panalId, precioEstimadoUnidad, minimoUnidades, objetivoUnidades, finReservas, unidadesCreador }) {
+/** Struct `panales(panalId)` con los montos en raw (bigint). null si no existe. */
+export async function leerPanalRaw(panalId) {
   assertConfigured();
-  const adelanto = await estimarAdelanto(precioEstimadoUnidad, unidadesCreador);
-  return pagarAdelantoYLlamar(uid, adelanto, 'crearPanal', [
-    panalId,
-    BigInt(precioEstimadoUnidad),
-    BigInt(minimoUnidades),
-    BigInt(objetivoUnidades),
-    BigInt(finReservas),
-    BigInt(unidadesCreador),
-  ]);
-}
-
-/** La Abeja reserva `unidades` celdas en un Panal existente pagando su adelanto. */
-export async function unirseAlPanal(uid, { panalId, unidades }) {
-  assertConfigured();
-  const adelanto = await publicClient.readContract({
-    address: env.CONTRATO_AVALANCH,
-    abi: escrowAbi,
-    functionName: 'calcularAdelanto',
-    args: [panalId, BigInt(unidades)],
-  });
-  return pagarAdelantoYLlamar(uid, adelanto, 'unirseAlPanal', [panalId, BigInt(unidades)]);
-}
-
-/** Lectura on-chain del struct `panales(panalId)`. */
-export async function leerPanal(panalId) {
-  if (!env.CONTRATO_AVALANCH) return null;
   const [
     precioEstimadoUnidad,
     precioFinalUnidad,
@@ -196,24 +86,249 @@ export async function leerPanal(panalId) {
     finRecoleccion,
     estado,
     existe,
-  ] = await publicClient.readContract({
-    address: env.CONTRATO_AVALANCH,
-    abi: escrowAbi,
-    functionName: 'panales',
-    args: [panalId],
-  });
+  ] = await read('panales', [panalId]);
   if (!existe) return null;
   return {
-    precioEstimadoUnidad: precioEstimadoUnidad.toString(),
-    precioFinalUnidad: precioFinalUnidad.toString(),
-    minimoUnidades: minimoUnidades.toString(),
-    objetivoUnidades: objetivoUnidades.toString(),
-    unidadesReservadas: unidadesReservadas.toString(),
-    unidadesPagadasCompletas: unidadesPagadasCompletas.toString(),
-    fondosPagadosCompletos: fondosPagadosCompletos.toString(),
+    precioEstimadoUnidad,
+    precioFinalUnidad,
+    minimoUnidades,
+    objetivoUnidades,
+    unidadesReservadas,
+    unidadesPagadasCompletas,
+    fondosPagadosCompletos,
     finReservas: Number(finReservas),
     finRecoleccion: Number(finRecoleccion),
-    // Indice del enum EscrowPanales.EstadoPanal (el ABI no trae los nombres).
     estado: Number(estado),
   };
 }
+
+/** Version serializable (JSON) de `leerPanalRaw`. */
+export async function leerPanal(panalId) {
+  if (!env.CONTRATO_AVALANCH) return null;
+  const p = await leerPanalRaw(panalId);
+  if (!p) return null;
+  return {
+    ...p,
+    precioEstimadoUnidad: p.precioEstimadoUnidad.toString(),
+    precioFinalUnidad: p.precioFinalUnidad.toString(),
+    minimoUnidades: p.minimoUnidades.toString(),
+    objetivoUnidades: p.objetivoUnidades.toString(),
+    unidadesReservadas: p.unidadesReservadas.toString(),
+    unidadesPagadasCompletas: p.unidadesPagadasCompletas.toString(),
+    fondosPagadosCompletos: p.fondosPagadosCompletos.toString(),
+  };
+}
+
+/** `abejasPorPanal(panalId, wallet)`: celdas, USDC pagado (raw) y si ya pago el total. */
+export async function leerAbeja(panalId, wallet) {
+  const [unidades, montoPagado, pagoCompleto] = await read('abejasPorPanal', [panalId, wallet]);
+  return { unidades, montoPagado, pagoCompleto };
+}
+
+/* ── Operaciones de la Abeja (UserOps patrocinadas) ───────────────────── */
+
+async function saldoUsdc(address) {
+  return publicClient.readContract({
+    address: env.USDC_TOKEN_ADDRESS,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [address],
+  });
+}
+
+/**
+ * Envia una UserOp desde la smart account del usuario.
+ * `cobro` es el USDC que se aprueba al escrow; `credito` lo que el mismo batch devuelve antes de cobrar
+ * (p. ej. salirDelPanal al aumentar la participacion), para validar el saldo antes de gastar gas.
+ */
+async function enviarUserOp(uid, calls, { cobro = 0n, credito = 0n, accion }) {
+  assertConfigured();
+  const wallet = await getSmartAccountAddress(uid);
+  if (cobro > 0n) {
+    const saldo = await saldoUsdc(wallet);
+    if (saldo + credito < cobro) {
+      const fmt = (v) => formatUnits(v, env.USDC_TOKEN_DECIMALS);
+      throw new HttpError(
+        400,
+        `Saldo insuficiente: necesitas ${fmt(cobro - credito)} USDC y tu reserva tiene ${fmt(saldo)} USDC`,
+        { code: 'saldo_insuficiente' },
+      );
+    }
+  }
+
+  const escrowCalls = calls.map((c) => ({ to: env.CONTRATO_AVALANCH, abi: escrowAbi, ...c }));
+  // salirDelPanal va antes del approve: el reembolso tiene que llegar antes de volver a cobrar.
+  const previas = escrowCalls.filter((c) => c.functionName === 'salirDelPanal');
+  const resto = escrowCalls.filter((c) => c.functionName !== 'salirDelPanal');
+  const approve =
+    cobro > 0n
+      ? [{ to: env.USDC_TOKEN_ADDRESS, abi: erc20Abi, functionName: 'approve', args: [env.CONTRATO_AVALANCH, cobro] }]
+      : [];
+
+  let result;
+  try {
+    result = await sendBatch(uid, { calls: [...previas, ...approve, ...resto] });
+  } catch (err) {
+    throw toHttpError(err, escrowAbi);
+  }
+  if (result.status !== 'success') {
+    throw new HttpError(502, `La operacion ${accion} revirtio en el contrato`, {
+      code: 'tx_reverted',
+      details: result.transactionHash,
+    });
+  }
+  return {
+    wallet,
+    monto: toUsdc(cobro - credito > 0n ? cobro - credito : 0n),
+    montoRaw: (cobro - credito > 0n ? cobro - credito : 0n).toString(),
+    userOpHash: result.userOpHash,
+    transactionHash: result.transactionHash,
+    explorerUrl: result.explorerUrl,
+  };
+}
+
+/**
+ * El usuario funda el Panal y reserva sus celdas en la misma UserOp:
+ * crearPanal(panalId, precioEstimadoUnidad, minimoUnidades, objetivoUnidades, finReservas, unidadesCreador).
+ * El contrato cobra al creador el adelanto (40%) de `unidadesCreador`.
+ */
+export async function crearPanal(uid, { panalId, precioEstimadoUnidad, minimoUnidades, objetivoUnidades, finReservas, unidadesCreador }) {
+  assertConfigured();
+  const adelanto = await estimarAdelanto(precioEstimadoUnidad, unidadesCreador);
+  return enviarUserOp(
+    uid,
+    [
+      {
+        functionName: 'crearPanal',
+        args: [
+          panalId,
+          BigInt(precioEstimadoUnidad),
+          BigInt(minimoUnidades),
+          BigInt(objetivoUnidades),
+          BigInt(finReservas),
+          BigInt(unidadesCreador),
+        ],
+      },
+    ],
+    { cobro: adelanto, accion: 'crearPanal' },
+  );
+}
+
+/**
+ * Nueva Abeja en el Panal. En Reservando paga el adelanto (unirseAlPanal); en Recolectando ya hay
+ * precio final y entra pagando el total (unirseAlPanalConPagoCompleto).
+ */
+export async function unirseAlPanal(uid, { panalId, unidades }) {
+  const panal = await leerPanalRaw(panalId);
+  if (!panal) throw new HttpError(404, 'El Panal no existe en el contrato', { code: 'not_found' });
+  const u = BigInt(unidades);
+
+  if (panal.estado === ESTADO.RESERVANDO) {
+    const cobro = await read('calcularAdelanto', [panalId, u]);
+    const r = await enviarUserOp(uid, [{ functionName: 'unirseAlPanal', args: [panalId, u] }], { cobro, accion: 'unirseAlPanal' });
+    return { ...r, tipo: 'adelanto' };
+  }
+  if (panal.estado === ESTADO.RECOLECTANDO) {
+    const cobro = panal.precioFinalUnidad * u;
+    const r = await enviarUserOp(uid, [{ functionName: 'unirseAlPanalConPagoCompleto', args: [panalId, u] }], {
+      cobro,
+      accion: 'unirseAlPanalConPagoCompleto',
+    });
+    return { ...r, tipo: 'pago_completo' };
+  }
+  throw new HttpError(400, 'Este Panal ya no acepta nuevas Abejas en su etapa actual', { code: 'etapa_invalida' });
+}
+
+/**
+ * Aumenta las celdas de una Abeja que ya participa. El contrato no deja reservar dos veces
+ * (AbejaYaParticipa), asi que en una sola UserOp atomica: salirDelPanal (devuelve lo pagado)
+ * + approve + volver a entrar con el total de celdas.
+ *   Reservando:   paga el adelanto del nuevo total.
+ *   Recolectando: paga el total al precio final (queda con el pago completo).
+ */
+export async function aumentarParticipacion(uid, { panalId, unidadesExtra }) {
+  const panal = await leerPanalRaw(panalId);
+  if (!panal) throw new HttpError(404, 'El Panal no existe en el contrato', { code: 'not_found' });
+  const wallet = await getSmartAccountAddress(uid);
+  const abeja = await leerAbeja(panalId, wallet);
+  if (abeja.unidades === 0n) throw new HttpError(400, 'No participas en este Panal', { code: 'no_participa' });
+
+  const total = abeja.unidades + BigInt(unidadesExtra);
+  const libres = panal.objetivoUnidades - panal.unidadesReservadas;
+  if (BigInt(unidadesExtra) > libres) {
+    throw new HttpError(400, `Solo quedan ${libres} celdas libres en este Panal`, { code: 'panal_lleno' });
+  }
+
+  if (panal.estado === ESTADO.RESERVANDO) {
+    const cobro = await estimarAdelanto(panal.precioEstimadoUnidad, total);
+    const r = await enviarUserOp(
+      uid,
+      [{ functionName: 'salirDelPanal', args: [panalId] }, { functionName: 'unirseAlPanal', args: [panalId, total] }],
+      { cobro, credito: abeja.montoPagado, accion: 'aumentarParticipacion' },
+    );
+    return { ...r, tipo: 'aumento', unidades: Number(total) };
+  }
+  if (panal.estado === ESTADO.RECOLECTANDO) {
+    const cobro = panal.precioFinalUnidad * total;
+    const r = await enviarUserOp(
+      uid,
+      [
+        { functionName: 'salirDelPanal', args: [panalId] },
+        { functionName: 'unirseAlPanalConPagoCompleto', args: [panalId, total] },
+      ],
+      { cobro, credito: abeja.montoPagado, accion: 'aumentarParticipacion' },
+    );
+    return { ...r, tipo: 'aumento', unidades: Number(total) };
+  }
+  throw new HttpError(400, 'Solo puedes aumentar tu participacion mientras el Panal reserva o cobra', {
+    code: 'etapa_invalida',
+  });
+}
+
+/** Paga el restante: precioFinal * celdas - lo ya pagado. */
+export async function pagarSaldo(uid, { panalId }) {
+  const panal = await leerPanalRaw(panalId);
+  if (!panal) throw new HttpError(404, 'El Panal no existe en el contrato', { code: 'not_found' });
+  if (panal.estado !== ESTADO.RECOLECTANDO) {
+    throw new HttpError(400, 'El Panal no esta cobrando el restante', { code: 'etapa_invalida' });
+  }
+  const wallet = await getSmartAccountAddress(uid);
+  const abeja = await leerAbeja(panalId, wallet);
+  if (abeja.unidades === 0n) throw new HttpError(400, 'No participas en este Panal', { code: 'no_participa' });
+  if (abeja.pagoCompleto) throw new HttpError(400, 'Ya pagaste el total de tus celdas', { code: 'pago_completo' });
+
+  const saldo = panal.precioFinalUnidad * abeja.unidades - abeja.montoPagado;
+  const r = await enviarUserOp(uid, [{ functionName: 'pagarSaldo', args: [panalId] }], { cobro: saldo, accion: 'pagarSaldo' });
+  return { ...r, tipo: 'saldo' };
+}
+
+/** Recupera lo pagado: Panal cancelado, o sellado sin haber pagado el restante. */
+export async function reembolsar(uid, { panalId }) {
+  const wallet = await getSmartAccountAddress(uid);
+  const abeja = await leerAbeja(panalId, wallet);
+  const r = await enviarUserOp(uid, [{ functionName: 'reembolsar', args: [panalId] }], { accion: 'reembolsar' });
+  return { ...r, tipo: 'reembolso', monto: toUsdc(abeja.montoPagado), montoRaw: abeja.montoPagado.toString() };
+}
+
+/* ── Transiciones de etapa (wallet master) ────────────────────────────── */
+
+const master = (functionName, args) => {
+  assertConfigured();
+  return writeAsMaster({
+    client: publicClient,
+    transport: fujiTransport,
+    explorerTxUrl,
+    address: env.CONTRATO_AVALANCH,
+    abi: escrowAbi,
+    functionName,
+    args,
+  });
+};
+
+export const iniciarCotizacion = (panalId) => master('iniciarCotizacion', [panalId]);
+export const abrirRecoleccion = (panalId, precioFinalRaw, finRecoleccion) =>
+  master('abrirRecoleccion', [panalId, BigInt(precioFinalRaw), BigInt(finRecoleccion)]);
+export const extenderPlazo = (panalId, nuevoFin) => master('extenderPlazo', [panalId, BigInt(nuevoFin)]);
+export const liberarFondos = (panalId) => master('liberarFondos', [panalId]);
+export const sellarPanal = (panalId) => master('sellarPanal', [panalId]);
+export const cancelarPanal = (panalId) => master('cancelarPanal', [panalId]);

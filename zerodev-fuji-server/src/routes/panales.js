@@ -4,30 +4,59 @@ import { parseUnits } from 'viem';
 import { z } from 'zod';
 import { db, FieldValue } from '../config/firebase.js';
 import { env } from '../config/env.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 import { HttpError, asyncHandler } from '../middleware/errors.js';
-import { crearPanal, leerPanal, obtenerPorcentajeAdelanto, unirseAlPanal } from '../services/escrowPanales.js';
+import {
+  aumentarParticipacion,
+  crearPanal,
+  leerPanal,
+  obtenerPorcentajeAdelanto,
+  pagarSaldo,
+  reembolsar,
+  unirseAlPanal,
+} from '../services/escrowPanales.js';
 import { imageUpload, storeImage } from '../services/images.js';
+import {
+  abrirCobro,
+  cancelar,
+  estimarCotizacion,
+  extenderCobro,
+  iniciarNegociacion,
+  negociarSiEstaLleno,
+  registrarMiembro,
+  registrarPago,
+  sellarYEmitir,
+  sincronizarPanal,
+} from '../services/panalLifecycle.js';
 
 /**
- * Panales (grupos de compra) respaldados por el contrato EscrowPanales:
- *   GET  /api/panales/config  -> { advancePercent, contractAddress }
- *   GET  /api/panales         -> { items }   con ?mine=1 solo donde el usuario participa
- *   GET  /api/panales/:id     -> { item }    incluye `onchain` leido del contrato
- *   POST /api/panales         multipart (photo?, type, description, link, minQuantity, targetUnits?,
- *                             unitPrice, deadline, units) -> { item }
- *   POST /api/panales/:id/join  { units } -> { item }
+ * Panales (grupos de compra) respaldados por EscrowPanales (Fuji) y ExaKey1155 (HashKey).
  *
- * Fundar un Panal obliga a reservar celdas: la smart account del usuario autenticado manda una UserOp
- * (patrocinada por el paymaster de ZeroDev) con approve del adelanto (40%) + crearPanal(..., unidadesCreador).
- * Solo si la UserOp se confirma se guarda el documento en Firestore.
+ * Abejas (smart account + paymaster de ZeroDev):
+ *   GET  /api/panales/config            -> { advancePercent, contractAddress, collectionHours, defaultProfitPercent }
+ *   GET  /api/panales                   -> { items }  (?mine=1 solo donde participa)
+ *   GET  /api/panales/:id               -> { item }   incluye `onchain`
+ *   POST /api/panales                   multipart: funda el Panal pagando el adelanto de `units`
+ *   POST /api/panales/:id/join          { units }  reservando: adelanto / cobrando: pago completo
+ *   POST /api/panales/:id/aumentar      { units }  celdas extra para quien ya participa
+ *   POST /api/panales/:id/pagar-saldo   paga el restante al precio final
+ *   POST /api/panales/:id/reembolsar    recupera lo pagado (cancelado, o sellado sin pagar el restante)
+ *
+ * Admin (wallet master):
+ *   POST /api/panales/:id/negociacion           iniciarCotizacion
+ *   POST /api/panales/:id/cotizacion/estimar    calcula el precio final (no toca la cadena)
+ *   POST /api/panales/:id/cotizacion            abrirRecoleccion con el precio final y el plazo de cobro
+ *   POST /api/panales/:id/extender              { hours } nuevo plazo si vencio sin el minimo pagado
+ *   POST /api/panales/:id/sellar                liberarFondos + sellarPanal + ExaKeys en HashKey
+ *   POST /api/panales/:id/cancelar              cancelarPanal
+ *   POST /api/panales/:id/sync                  relee la cadena y actualiza Firestore
  */
 const router = Router();
 
-// El gas de cada UserOp lo patrocina el paymaster de ZeroDev: limitamos por usuario.
+// Cada UserOp la patrocina el paymaster de ZeroDev: limitamos por usuario.
 const writeLimiter = rateLimit({
   windowMs: 60_000,
-  limit: 5,
+  limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.user?.uid ?? req.ip,
@@ -35,6 +64,7 @@ const writeLimiter = rateLimit({
 });
 
 const units = z.coerce.number().int('Debe ser un entero').positive('Debe ser mayor a 0');
+const usdc = z.coerce.number().min(0, 'No puede ser negativo');
 
 const createSchema = z
   .object({
@@ -56,7 +86,17 @@ const createSchema = z
     message: 'No puedes reservar mas celdas que el total del Panal',
   });
 
-const joinSchema = z.object({ units });
+const unitsSchema = z.object({ units });
+
+const quoteSchema = z.object({
+  precioProveedorUnidad: z.coerce.number().positive('El precio del proveedor debe ser mayor a 0'),
+  envioTotal: usdc.default(0),
+  otrosCostos: usdc.default(0),
+  gananciaPorcentaje: z.coerce.number().min(0).max(1000).default(env.PANAL_GANANCIA_PORCENTAJE),
+  horasCobro: z.coerce.number().positive().max(24 * 30).optional(),
+});
+
+const extendSchema = z.object({ hours: z.coerce.number().positive().max(24 * 30).default(env.PANAL_COBRO_HORAS) });
 
 function parseOrThrow(schema, body) {
   // multipart llega con strings vacios para campos no enviados; los tratamos como ausentes.
@@ -88,21 +128,21 @@ function timestampToIso(value) {
 }
 
 function serializeMember(m) {
+  const paidTotal = Number(m.paidTotal ?? m.advancePaid ?? 0);
   return {
     uid: String(m.uid ?? ''),
     name: String(m.name ?? ''),
     wallet: String(m.wallet ?? ''),
     units: Number(m.units ?? 0),
-    advancePaid: Number(m.advancePaid ?? 0),
-    transactionHash: String(m.transactionHash ?? ''),
-    explorerUrl: String(m.explorerUrl ?? ''),
+    paidTotal,
+    paidComplete: Boolean(m.paidComplete),
+    transactionHash: String(m.lastTransactionHash ?? m.transactionHash ?? ''),
+    explorerUrl: String(m.lastExplorerUrl ?? m.explorerUrl ?? ''),
     joinedAt: String(m.joinedAt ?? ''),
   };
 }
 
 function serializePanal(id, data) {
-  const targetUnits = Number(data.targetUnits ?? 0);
-  const currentUnits = Number(data.currentUnits ?? 0);
   return {
     id,
     type: String(data.type ?? 'local'),
@@ -110,12 +150,21 @@ function serializePanal(id, data) {
     description: String(data.description ?? ''),
     link: String(data.link ?? ''),
     minQuantity: Number(data.minQuantity ?? 0),
-    targetUnits,
-    currentUnits,
+    targetUnits: Number(data.targetUnits ?? 0),
+    currentUnits: Number(data.currentUnits ?? 0),
+    paidUnits: Number(data.paidUnits ?? 0),
     unitPrice: Number(data.unitPrice ?? 0),
+    finalUnitPrice: data.finalUnitPrice == null ? null : Number(data.finalUnitPrice),
     deadline: String(data.deadline ?? ''),
     finReservas: Number(data.finReservas ?? 0),
-    status: targetUnits > 0 && currentUnits >= targetUnits ? 'funded' : 'open',
+    stage: String(data.stage ?? 'reservando'),
+    collectionEndsAt: data.collectionEndsAt ?? null,
+    collectionExpired: Boolean(data.collectionExpired),
+    quote: data.quote ?? null,
+    negotiation: data.negotiation ?? null,
+    txs: data.txs ?? {},
+    tokenId: data.tokenId == null ? null : Number(data.tokenId),
+    exakeys: data.exakeys ?? null,
     members: Array.isArray(data.members) ? data.members.map(serializeMember) : [],
     memberIds: Array.isArray(data.memberIds) ? data.memberIds.map(String) : [],
     contractAddress: String(data.contractAddress ?? ''),
@@ -132,24 +181,26 @@ async function displayNameOf(uid) {
   return snap.exists ? String(snap.data()?.displayName ?? '') : '';
 }
 
-function memberEntry(uid, name, payment, unitsReserved) {
-  return {
-    uid,
-    name,
-    wallet: payment.wallet,
-    units: unitsReserved,
-    advancePaid: payment.adelanto,
-    advancePaidRaw: payment.adelantoRaw,
-    transactionHash: payment.transactionHash,
-    explorerUrl: payment.explorerUrl,
-    // serverTimestamp no se permite dentro de arrays.
-    joinedAt: new Date().toISOString(),
-  };
+async function loadPanalDoc(id) {
+  const snap = await db.collection('panales').doc(id).get();
+  if (!snap.exists) throw new HttpError(404, 'Panal no encontrado', { code: 'not_found' });
+  const data = snap.data() ?? {};
+  if (String(data.contractAddress ?? '').toLowerCase() !== String(env.CONTRATO_AVALANCH ?? '').toLowerCase()) {
+    throw new HttpError(410, 'Este Panal pertenece a un contrato anterior', { code: 'contrato_anterior' });
+  }
+  return data;
+}
+
+async function respondWithPanal(res, id, extra = {}) {
+  const snap = await db.collection('panales').doc(id).get();
+  res.json({ item: serializePanal(snap.id, snap.data() ?? {}), ...extra });
 }
 
 router.use(requireAuth);
 
-/** GET /api/panales/config — porcentaje de adelanto que cobra el contrato */
+const adminOnly = requireRole('admin');
+
+/** GET /api/panales/config — parametros del contrato y del ciclo de vida */
 router.get(
   '/config',
   asyncHandler(async (_req, res) => {
@@ -157,6 +208,9 @@ router.get(
     res.json({
       advancePercent: (Number(numerador) * 100) / Number(base),
       contractAddress: env.CONTRATO_AVALANCH,
+      exakeyContract: env.CONTRATO_HSK ?? null,
+      collectionHours: env.PANAL_COBRO_HORAS,
+      defaultProfitPercent: env.PANAL_GANANCIA_PORCENTAJE,
     });
   }),
 );
@@ -226,53 +280,146 @@ router.post(
       ...panal,
       targetUnits,
       currentUnits: reserved,
+      paidUnits: 0,
       finReservas,
+      stage: 'reservando',
+      onchainState: 0,
       ...photo,
-      members: [memberEntry(uid, name, payment, reserved)],
+      members: [
+        {
+          uid,
+          name,
+          wallet: payment.wallet,
+          units: reserved,
+          paidTotal: payment.monto,
+          paidComplete: false,
+          lastTransactionHash: payment.transactionHash,
+          lastExplorerUrl: payment.explorerUrl,
+          joinedAt: new Date().toISOString(),
+        },
+      ],
       memberIds: [uid],
       contractAddress: env.CONTRATO_AVALANCH,
       userOpHash: payment.userOpHash,
       transactionHash: payment.transactionHash,
       explorerUrl: payment.explorerUrl,
+      txs: { crear: { hash: payment.transactionHash, explorerUrl: payment.explorerUrl, at: new Date().toISOString() } },
       createdBy: uid,
       createdByName: name,
       createdAt: FieldValue.serverTimestamp(),
     });
-    const created = await ref.get();
-    res.status(201).json({ item: serializePanal(created.id, created.data() ?? {}) });
+    await registrarPago(ref.id, { uid, tipo: 'adelanto', unidades: reserved, payment });
+    await sincronizarPanal(ref.id);
+    await negociarSiEstaLleno(ref.id);
+    await respondWithPanal(res.status(201), ref.id);
   }),
 );
 
-/** POST /api/panales/:id/join — la Abeja reserva celdas pagando el adelanto */
+/** Ejecuta una accion de la Abeja, la registra en `pagos` y resincroniza el Panal. */
+function abejaAction(handler) {
+  return [
+    writeLimiter,
+    asyncHandler(async (req, res) => {
+      const { uid } = req.user;
+      const panalId = req.params.id;
+      const data = await loadPanalDoc(panalId);
+      const { payment, unidades } = await handler({ req, uid, panalId, data });
+      await registrarMiembro(panalId, { uid, name: await displayNameOf(uid), payment });
+      await registrarPago(panalId, { uid, tipo: payment.tipo, unidades, payment });
+      await sincronizarPanal(panalId);
+      await negociarSiEstaLleno(panalId);
+      await respondWithPanal(res, panalId, { payment });
+    }),
+  ];
+}
+
+/** POST /api/panales/:id/join — reservando: paga el adelanto; cobrando: entra pagando el total */
 router.post(
   '/:id/join',
-  writeLimiter,
-  asyncHandler(async (req, res) => {
-    const { units: reserved } = parseOrThrow(joinSchema, req.body);
-    const { uid } = req.user;
-    const ref = db.collection('panales').doc(req.params.id);
-    const snap = await ref.get();
-    if (!snap.exists) throw new HttpError(404, 'Panal no encontrado', { code: 'not_found' });
-
-    const current = serializePanal(snap.id, snap.data() ?? {});
-    if (current.memberIds.includes(uid)) {
-      throw new HttpError(400, 'Ya reservaste celdas en este Panal', { code: 'already_member' });
+  ...abejaAction(async ({ req, uid, panalId, data }) => {
+    const { units: unidades } = parseOrThrow(unitsSchema, req.body);
+    if ((data.memberIds ?? []).includes(uid)) {
+      throw new HttpError(400, 'Ya participas en este Panal: usa "aumentar participacion"', { code: 'already_member' });
     }
-    if (reserved > current.targetUnits - current.currentUnits) {
-      throw new HttpError(400, 'No quedan tantas celdas libres en este Panal', { code: 'panal_full' });
-    }
-
-    const payment = await unirseAlPanal(uid, { panalId: ref.id, unidades: reserved });
-
-    await ref.update({
-      members: FieldValue.arrayUnion(memberEntry(uid, await displayNameOf(uid), payment, reserved)),
-      memberIds: FieldValue.arrayUnion(uid),
-      currentUnits: FieldValue.increment(reserved),
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-    const updated = await ref.get();
-    res.json({ item: serializePanal(updated.id, updated.data() ?? {}) });
+    return { payment: await unirseAlPanal(uid, { panalId, unidades }), unidades };
   }),
+);
+
+/** POST /api/panales/:id/aumentar — celdas extra para una Abeja que ya participa */
+router.post(
+  '/:id/aumentar',
+  ...abejaAction(async ({ req, uid, panalId }) => {
+    const { units: unidadesExtra } = parseOrThrow(unitsSchema, req.body);
+    const payment = await aumentarParticipacion(uid, { panalId, unidadesExtra });
+    return { payment, unidades: payment.unidades };
+  }),
+);
+
+/** POST /api/panales/:id/pagar-saldo — paga el restante y las comisiones al precio final */
+router.post(
+  '/:id/pagar-saldo',
+  ...abejaAction(async ({ uid, panalId }) => ({ payment: await pagarSaldo(uid, { panalId }) })),
+);
+
+/** POST /api/panales/:id/reembolsar — recupera lo pagado */
+router.post(
+  '/:id/reembolsar',
+  ...abejaAction(async ({ uid, panalId }) => ({ payment: await reembolsar(uid, { panalId }) })),
+);
+
+/* ── Admin ────────────────────────────────────────────────────────────── */
+
+function adminAction(handler) {
+  return [
+    adminOnly,
+    asyncHandler(async (req, res) => {
+      const panalId = req.params.id;
+      await loadPanalDoc(panalId);
+      const result = await handler({ req, panalId, actor: req.user.uid });
+      await respondWithPanal(res, panalId, { result });
+    }),
+  ];
+}
+
+router.post(
+  '/:id/negociacion',
+  ...adminAction(({ panalId, actor }) => iniciarNegociacion(panalId, actor)),
+);
+
+/** Solo calcula: no cambia la etapa ni toca la cadena */
+router.post(
+  '/:id/cotizacion/estimar',
+  adminOnly,
+  asyncHandler(async (req, res) => {
+    await loadPanalDoc(req.params.id);
+    const input = parseOrThrow(quoteSchema, req.body);
+    res.json({ quote: await estimarCotizacion(req.params.id, input, req.user.uid) });
+  }),
+);
+
+router.post(
+  '/:id/cotizacion',
+  ...adminAction(({ req, panalId, actor }) => abrirCobro(panalId, parseOrThrow(quoteSchema, req.body), actor)),
+);
+
+router.post(
+  '/:id/extender',
+  ...adminAction(({ req, panalId }) => extenderCobro(panalId, parseOrThrow(extendSchema, req.body).hours)),
+);
+
+router.post(
+  '/:id/sellar',
+  ...adminAction(({ panalId }) => sellarYEmitir(panalId)),
+);
+
+router.post(
+  '/:id/cancelar',
+  ...adminAction(({ panalId }) => cancelar(panalId)),
+);
+
+router.post(
+  '/:id/sync',
+  ...adminAction(({ panalId }) => sincronizarPanal(panalId).then(() => null)),
 );
 
 export default router;

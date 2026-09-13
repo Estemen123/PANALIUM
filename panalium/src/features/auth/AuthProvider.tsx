@@ -30,7 +30,14 @@ import { loadProductsFromBackend } from "@/features/products/api"
 
 import { loadPanalesFromBackend } from "@/features/groups/api"
 
-import { groupsActions, productsActions, useAppDispatch } from "@/store"
+import { loadExaKeysFromBackend } from "@/features/receipts/api"
+
+import {
+  groupsActions,
+  productsActions,
+  receiptsActions,
+  useAppDispatch,
+} from "@/store"
 
 export type AuthResult = ActionResult
 
@@ -197,6 +204,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         dispatch(groupsActions.setAll([]))
       }
 
+      // Recibos NFT: una ExaKey por unidad de producto de los Panales sellados.
+
+      try {
+        dispatch(receiptsActions.setTokens(await loadExaKeysFromBackend(token)))
+      } catch (error) {
+        console.warn("Failed to load backend exakeys", error)
+
+        dispatch(receiptsActions.setTokens([]))
+      }
+
       return mapFirebaseUser(firebaseUser, profile)
     },
 
@@ -317,6 +334,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     dispatch(groupsActions.setAll([]))
 
+    dispatch(receiptsActions.setTokens([]))
+
     reset()
   }, [dispatch, reset])
 
@@ -328,6 +347,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         dispatch(productsActions.setAll([]))
 
         dispatch(groupsActions.setAll([]))
+
+        dispatch(receiptsActions.setTokens([]))
 
         setReady(true)
 

@@ -1,12 +1,17 @@
+import { useState } from "react"
 import { Card, Page, PageHeader, StatCard } from "@/shared/ui"
 import { useAppState } from "@/store"
 import { ProductRow } from "@/features/products"
+import { PanalAdminModal } from "@/features/groups"
 import { useAdminStats } from "../hooks/useAdminStats"
 import GroupSummaryRow from "../components/GroupSummaryRow"
 
 export default function AdminOverviewPage() {
   const { groups, products } = useAppState()
   const stats = useAdminStats()
+  const [managingId, setManagingId] = useState<string | null>(null)
+  // Se resuelve desde el store para que el modal refleje cada cambio de etapa.
+  const managing = groups.find((g) => g.id === managingId)
 
   return (
     <Page>
@@ -32,7 +37,11 @@ export default function AdminOverviewPage() {
           <h2 className="display text-xl font-bold">Todos los Panales</h2>
           <div className="flex flex-col gap-2.5">
             {groups.map((g) => (
-              <GroupSummaryRow key={g.id} group={g} />
+              <GroupSummaryRow
+                key={g.id}
+                group={g}
+                onManage={() => setManagingId(g.id)}
+              />
             ))}
           </div>
         </Card>
@@ -45,6 +54,13 @@ export default function AdminOverviewPage() {
           </div>
         </Card>
       </div>
+
+      {managing && (
+        <PanalAdminModal
+          group={managing}
+          onClose={() => setManagingId(null)}
+        />
+      )}
     </Page>
   )
 }

@@ -23,8 +23,12 @@ export default function JoinBar({
   const [units, setUnits] = useState(Math.min(10, Math.max(1, maxUnits)))
   const [loading, setLoading] = useState(false)
   const clamp = (n: number) => Math.min(maxUnits, Math.max(1, n))
-  const total = units * group.unitPrice
-  const advance = (total * advancePercent) / 100
+  // Durante el cobro ya hay precio final: quien entra paga el total de una vez.
+  const collecting = group.status === "collecting"
+  const unitPrice = collecting ? (group.finalUnitPrice ?? group.unitPrice) : group.unitPrice
+  const total = units * unitPrice
+  const payPercent = collecting ? 100 : advancePercent
+  const advance = (total * payPercent) / 100
 
   async function handleJoin() {
     setLoading(true)
@@ -40,10 +44,11 @@ export default function JoinBar({
       <div className="min-w-0">
         <p className="label text-honey-light">Unirte a este Panal</p>
         <p className="text-[13px] text-secondary-foreground mt-0.5">
-          Cada celda son {formatPrice(group.unitPrice, group.currency)}{" "}
-          {group.currency}. Pagas el {advancePercent}% ahora (
-          {formatPrice(total, group.currency)} {group.currency} en total) y el
-          resto cuando el Panal se llene.
+          Cada celda son {formatPrice(unitPrice, group.currency)}{" "}
+          {group.currency}.{" "}
+          {collecting
+            ? "El Panal ya tiene precio final: pagas el total de tus celdas."
+            : `Pagas el ${advancePercent}% ahora (${formatPrice(total, group.currency)} ${group.currency} en total) y el resto al cerrar la negociación.`}
         </p>
       </div>
       <div className="flex items-center gap-2.5 shrink-0">
@@ -77,7 +82,7 @@ export default function JoinBar({
         <Button onClick={handleJoin} disabled={loading}>
           {loading
             ? "Pagando en Avalanche..."
-            : `Pagar ${advancePercent}% · ${formatPrice(advance, group.currency, 4)} ${group.currency}`}
+            : `Pagar ${payPercent}% · ${formatPrice(advance, group.currency, 4)} ${group.currency}`}
         </Button>
       </div>
     </div>

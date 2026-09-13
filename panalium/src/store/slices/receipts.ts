@@ -11,6 +11,11 @@ export interface AddTokenAction {
   token: ERC1155Token
 }
 
+export interface SetTokensAction {
+  type: "tokens/setAll"
+  tokens: ERC1155Token[]
+}
+
 export interface SetTokenStatusAction {
   type: "tokens/setStatus"
   tokenId: string
@@ -33,12 +38,17 @@ export interface SetListingStatusAction {
   status: NFTListingStatus
 }
 
-export type ReceiptsAction = AddTokenAction | SetTokenStatusAction | AddListingAction | ReplaceListingAction | SetListingStatusAction
+export type ReceiptsAction = AddTokenAction | SetTokensAction | SetTokenStatusAction | AddListingAction | ReplaceListingAction | SetListingStatusAction
 
 export const receiptsActions = {
   addToken: (token: ERC1155Token): ReceiptsAction => ({
     type: "tokens/add",
     token,
+  }),
+  /** Replaces the user's receipts (ExaKeys loaded from the backend). */
+  setTokens: (tokens: ERC1155Token[]): ReceiptsAction => ({
+    type: "tokens/setAll",
+    tokens,
   }),
   setTokenStatus: (tokenId: string, status: TokenStatus): ReceiptsAction => ({
     type: "tokens/setStatus",
@@ -64,6 +74,8 @@ export function tokensReducer(
   action: AppAction,
 ): ERC1155Token[] {
   switch (action.type) {
+    case "tokens/setAll":
+      return action.tokens
     case "tokens/add":
       return [...state, action.token]
     case "tokens/setStatus":

@@ -11,15 +11,30 @@ import { useCurrentUser } from "@/features/auth"
 import { useSmartAccount } from "@/features/wallet"
 import { fail, ok, type ActionResult } from "@/shared/lib/result"
 import {
+  cancelPanalOnBackend,
   createPanalOnBackend,
+  extendCollectionOnBackend,
+  increasePanalOnBackend,
   joinPanalOnBackend,
   loadPanalConfig,
   loadPanalesFromBackend,
+  openCollectionOnBackend,
+  payRemainingOnBackend,
+  refundPanalOnBackend,
+  sealPanalOnBackend,
+  startNegotiationOnBackend,
+  type PanalConfig,
+  type QuoteInput,
 } from "../api"
 
-/** Adelanto por defecto mientras llega el valor real del contrato. */
-const DEFAULT_ADVANCE_PERCENT = 40
-let advancePercentCache: number | null = null
+/** Valores por defecto mientras llega la configuración real del backend. */
+const DEFAULT_CONFIG: PanalConfig = {
+  advancePercent: 40,
+  contractAddress: "",
+  collectionHours: 48,
+  defaultProfitPercent: 10,
+}
+let configCache: PanalConfig | null = null
 
 export function useGroups(): BuyingGroup[] {
   return useAppState().groups
@@ -32,26 +47,48 @@ export function useMyGroups(): BuyingGroup[] {
   return useMemo(() => groupsForUser(groups, user.id), [groups, user.id])
 }
 
-/** Porcentaje del total que se paga al reservar celdas (PORCENTAJE_ADELANTO del contrato). */
-export function useAdvancePercent(): number {
-  const [percent, setPercent] = useState(
-    advancePercentCache ?? DEFAULT_ADVANCE_PERCENT,
-  )
+/** Parámetros del contrato y del ciclo de vida (adelanto, horas de cobro, ganancia sugerida). */
+export function usePanalConfig(): PanalConfig {
+  const [config, setConfig] = useState(configCache ?? DEFAULT_CONFIG)
   useEffect(() => {
-    if (advancePercentCache !== null) return
+    if (configCache !== null) return
     loadPanalConfig()
-      .then((config) => {
-        advancePercentCache = config.advancePercent
-        setPercent(config.advancePercent)
+      .then((loaded) => {
+        configCache = loaded
+        setConfig(loaded)
       })
       .catch(() => {})
   }, [])
-  return percent
+  return config
+}
+
+/** Porcentaje del total que se paga al reservar celdas (PORCENTAJE_ADELANTO del contrato). */
+export function useAdvancePercent(): number {
+  return usePanalConfig().advancePercent
+}
+
+/** Envuelve una llamada al backend que devuelve el Panal actualizado. */
+function useGroupMutation() {
+  const dispatch = useAppDispatch()
+  const { refresh: refreshBalance } = useSmartAccount()
+  return useCallback(
+    async (run: () => Promise<BuyingGroup>): Promise<ActionResult> => {
+      try {
+        dispatch(groupsActions.replace(await run()))
+        void refreshBalance()
+        return ok
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : String(err))
+      }
+    },
+    [dispatch, refreshBalance],
+  )
 }
 
 export function useGroupActions() {
   const dispatch = useAppDispatch()
   const { refresh: refreshBalance } = useSmartAccount()
+  const mutate = useGroupMutation()
 
   /** Vuelve a traer los Panales desde Firestore. */
   const reloadGroups = useCallback(async () => {
@@ -69,31 +106,57 @@ export function useGroupActions() {
     [dispatch, refreshBalance],
   )
 
-  /** Reserva celdas pagando el adelanto desde la smart account. */
+  /** Reservando: paga el adelanto. Cobrando: entra pagando el total. */
   const joinGroup = useCallback(
-    async (
-      group: BuyingGroup,
-      input: JoinGroupInput,
-    ): Promise<ActionResult> => {
+    (group: BuyingGroup, input: JoinGroupInput): Promise<ActionResult> => {
       if (!canJoinSwarm(group, input.swarmId, input.units)) {
-        return fail(
-          "Este Enjambre no tiene espacio para tantas celdas. Elige menos celdas.",
+        return Promise.resolve(
+          fail("No quedan tantas celdas libres. Elige menos celdas."),
         )
       }
-      try {
-        dispatch(
-          groupsActions.replace(
-            await joinPanalOnBackend(group.id, input.units),
-          ),
-        )
-        void refreshBalance()
-        return ok
-      } catch (err) {
-        return fail(err instanceof Error ? err.message : String(err))
-      }
+      return mutate(() => joinPanalOnBackend(group.id, input.units))
     },
-    [dispatch, refreshBalance],
+    [mutate],
   )
 
-  return { createGroup, joinGroup, reloadGroups }
+  const increaseParticipation = useCallback(
+    (group: BuyingGroup, units: number) =>
+      mutate(() => increasePanalOnBackend(group.id, units)),
+    [mutate],
+  )
+
+  const payRemaining = useCallback(
+    (group: BuyingGroup) => mutate(() => payRemainingOnBackend(group.id)),
+    [mutate],
+  )
+
+  const refund = useCallback(
+    (group: BuyingGroup) => mutate(() => refundPanalOnBackend(group.id)),
+    [mutate],
+  )
+
+  return {
+    createGroup,
+    joinGroup,
+    increaseParticipation,
+    payRemaining,
+    refund,
+    reloadGroups,
+  }
+}
+
+/** Transiciones de etapa que ejecuta el admin con la wallet master. */
+export function useAdminPanalActions() {
+  const mutate = useGroupMutation()
+  return {
+    startNegotiation: (group: BuyingGroup) =>
+      mutate(() => startNegotiationOnBackend(group.id)),
+    openCollection: (group: BuyingGroup, input: QuoteInput) =>
+      mutate(() => openCollectionOnBackend(group.id, input)),
+    extendCollection: (group: BuyingGroup, hours: number) =>
+      mutate(() => extendCollectionOnBackend(group.id, hours)),
+    seal: (group: BuyingGroup) => mutate(() => sealPanalOnBackend(group.id)),
+    cancel: (group: BuyingGroup) =>
+      mutate(() => cancelPanalOnBackend(group.id)),
+  }
 }

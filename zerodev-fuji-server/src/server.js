@@ -1,12 +1,15 @@
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { chain } from './config/chain.js';
+import { iniciarSchedulerPanales } from './services/panalLifecycle.js';
 
 const app = createApp();
 
 const server = app.listen(env.PORT, () => {
   console.log(`API escuchando en http://localhost:${env.PORT}`);
   console.log(`Red: ${chain.name} (${chain.id})`);
+  // Sella los Panales cuyo cobro vencio con el minimo pagado y emite sus ExaKeys.
+  if (iniciarSchedulerPanales()) console.log(`Scheduler de Panales cada ${env.PANAL_SCHEDULER_SEGUNDOS}s`);
 });
 
 /**

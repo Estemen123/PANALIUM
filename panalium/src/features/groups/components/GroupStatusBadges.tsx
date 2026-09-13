@@ -8,6 +8,8 @@ import {
 const STATUS_VARIANT: Record<GroupStatus, BadgeVariant> = {
   open: "light",
   funded: "success",
+  negotiating: "dark",
+  collecting: "primary",
   paid_to_supplier: "primary",
   closed: "neutral",
   cancelled: "outline",

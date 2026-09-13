@@ -69,9 +69,25 @@ export function openGroups(groups: BuyingGroup[]): BuyingGroup[] {
 export function canJoinGroup(group: BuyingGroup, user: User): boolean {
   return (
     user.role === "buyer" &&
-    group.status === "open" &&
+    (group.status === "open" || group.status === "collecting") &&
     !isGroupMember(group, user.id)
   )
+}
+
+/** Quien ya participa puede sumar celdas mientras el Panal reserva o cobra, si quedan libres. */
+export function canIncreaseParticipation(group: BuyingGroup, userId: string): boolean {
+  return (
+    isGroupMember(group, userId) &&
+    (group.status === "open" || group.status === "collecting") &&
+    remainingUnits(group) > 0
+  )
+}
+
+/** Lo que le falta pagar a la Abeja al precio final. */
+export function remainingToPay(group: BuyingGroup, userId: string): number {
+  const entry = memberEntry(group, userId)
+  if (!entry || entry.paidComplete || group.finalUnitPrice == null) return 0
+  return Math.max(0, group.finalUnitPrice * entry.units - entry.paid)
 }
 
 export type GroupTypeFilter = GroupType | "all"
@@ -152,6 +168,8 @@ export function canJoinSwarm(
 export const GROUP_STATUS_LABELS: Record<GroupStatus, string> = {
   open: "Recolectando",
   funded: "Panal lleno",
+  negotiating: "En negociación",
+  collecting: "Cobrando restante",
   paid_to_supplier: "Néctar enviado",
   closed: "Sellado",
   cancelled: "Panal disuelto",

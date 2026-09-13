@@ -8,6 +8,7 @@ import {
   type BuyingGroup,
 } from "@/domain"
 import GroupStatusBadges from "./GroupStatusBadges"
+import BuyMoreCellsButton from "./BuyMoreCellsButton"
 
 export default function MyGroupCard({
   group,
@@ -57,6 +58,11 @@ export default function MyGroupCard({
         </span>
         <span>{groupProgress(group)}% lleno</span>
       </div>
+      {entry && (
+        <div className="flex justify-end mt-3">
+          <BuyMoreCellsButton group={group} userId={userId} size="sm" />
+        </div>
+      )}
     </Card>
   )
 }

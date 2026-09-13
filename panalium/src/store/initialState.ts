@@ -2,7 +2,6 @@ import type { AppState } from "./types"
 import {
   MOCK_LISTINGS,
   MOCK_PRODUCTS,
-  MOCK_TOKENS,
   MOCK_USERS,
 } from "@/data/mocks"
 
@@ -13,7 +12,8 @@ export function createInitialState(): AppState {
     products: MOCK_PRODUCTS,
     // Los Panales llegan de GET /api/panales al iniciar sesión.
     groups: [],
-    tokens: MOCK_TOKENS,
+    // Las Hexakeys (ExaKeys) llegan de GET /api/exakeys al iniciar sesión.
+    tokens: [],
     listings: MOCK_LISTINGS,
   }
 }

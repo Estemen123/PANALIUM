@@ -3,33 +3,35 @@ import { Button, Modal } from "@/shared/ui"
 import { Icon } from "@/shared/icons/Icon"
 import { useSmartAccount } from "@/features/wallet"
 import { useAdvancePercent } from "../hooks/useGroups"
+import { formatUsdc } from "../lib/formatUsdc"
 
 export interface ReserveCellsModalProps {
-  /** Precio por celda en USDC. */
+  /** Precio por celda en USDC (estimado al reservar, final durante el cobro). */
   unitPrice: number
-  /** Celdas totales del Panal: tope de la reserva. */
+  /** Celdas que se pueden sumar como máximo. */
   maxUnits: number
   title: string
   confirmLabel: string
+  /** advance: se paga el adelanto; full: se paga el total al precio final. */
+  mode?: "advance" | "full"
+  /** Celdas que la Abeja ya tiene (al aumentar su participación). */
+  baseUnits?: number
+  /** USDC que ya pagó; se descuenta de lo que paga ahora. */
+  alreadyPaid?: number
   onClose: () => void
-  /** Paga el adelanto y crea/une; si lanza, el mensaje se muestra en el popup. */
+  /** Paga y ejecuta; si lanza, el mensaje se muestra en el popup. */
   onConfirm: (units: number) => Promise<void>
 }
 
-/** USDC con los decimales que haga falta (el adelanto puede ser menor a un centavo). */
-function formatUsdc(value: number): string {
-  return value.toLocaleString("es-VE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6,
-  })
-}
-
-/** Popup para elegir cuántas celdas reservar y pagar el adelanto al contrato EscrowPanales. */
+/** Popup para elegir cuántas celdas reservar (o sumar) y pagar al contrato EscrowPanales. */
 export default function ReserveCellsModal({
   unitPrice,
   maxUnits,
   title,
   confirmLabel,
+  mode = "advance",
+  baseUnits = 0,
+  alreadyPaid = 0,
   onClose,
   onConfirm,
 }: ReserveCellsModalProps) {
@@ -40,10 +42,13 @@ export default function ReserveCellsModal({
   const [loading, setLoading] = useState(false)
 
   const clamp = (n: number) => Math.min(maxUnits, Math.max(1, n))
-  const total = units * unitPrice
-  const advance = (total * advancePercent) / 100
+  const totalUnits = baseUnits + units
+  const total = totalUnits * unitPrice
+  const due = mode === "full" ? total : (total * advancePercent) / 100
+  const payNow = Math.max(0, due - alreadyPaid)
+  const later = total - due
   const balance = tokenBalance ? Number(tokenBalance.formatted) : null
-  const insufficient = balance !== null && balance < advance
+  const insufficient = balance !== null && balance < payNow
 
   async function handleConfirm() {
     setError("")
@@ -56,15 +61,22 @@ export default function ReserveCellsModal({
     }
   }
 
+  const description =
+    mode === "full"
+      ? "El Panal ya tiene precio final: pagas el total de tus celdas (producto, envío y comisión)."
+      : `Pagas el ${advancePercent}% ahora y te comprometes a pagar el resto cuando el Panal cierre su negociación.`
+
   return (
     <Modal
       title={title}
-      description={`Elige cuántas celdas quieres. Pagas el ${advancePercent}% ahora y te comprometes a pagar el resto cuando el Panal se llene.`}
+      description={description}
       onClose={loading ? () => {} : onClose}
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-semibold">Celdas a reservar</span>
+          <span className="text-sm font-semibold">
+            {baseUnits > 0 ? "Celdas a sumar" : "Celdas a reservar"}
+          </span>
           <div className="h-10 border-[1.5px] border-border rounded-xl flex items-center px-2 gap-2">
             <button
               type="button"
@@ -102,18 +114,30 @@ export default function ReserveCellsModal({
         <dl className="mono text-[13px] flex flex-col gap-1.5 bg-primary/10 rounded-xl px-4 py-3">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">
-              {units} × {formatUsdc(unitPrice)} USDC
+              {totalUnits} × {formatUsdc(unitPrice)} USDC
             </dt>
             <dd>{formatUsdc(total)} USDC</dd>
           </div>
+          {alreadyPaid > 0 && (
+            <div className="flex justify-between text-muted-foreground">
+              <dt>Ya pagado</dt>
+              <dd>−{formatUsdc(alreadyPaid)} USDC</dd>
+            </div>
+          )}
           <div className="flex justify-between font-bold text-[15px]">
-            <dt>Adelanto ({advancePercent}%) a pagar ahora</dt>
-            <dd>{formatUsdc(advance)} USDC</dd>
+            <dt>
+              {mode === "full"
+                ? "A pagar ahora"
+                : `Adelanto (${advancePercent}%) a pagar ahora`}
+            </dt>
+            <dd>{formatUsdc(payNow)} USDC</dd>
           </div>
-          <div className="flex justify-between text-muted-foreground">
-            <dt>Resto al llenarse el Panal</dt>
-            <dd>{formatUsdc(total - advance)} USDC</dd>
-          </div>
+          {later > 0 && (
+            <div className="flex justify-between text-muted-foreground">
+              <dt>Resto estimado al cerrar la negociación</dt>
+              <dd>{formatUsdc(later)} USDC</dd>
+            </div>
+          )}
           {balance !== null && (
             <div className="flex justify-between text-muted-foreground border-t border-border pt-1.5 mt-1">
               <dt>Tu reserva de USDC</dt>
@@ -123,8 +147,10 @@ export default function ReserveCellsModal({
         </dl>
 
         <p className="text-xs text-muted-foreground">
-          El adelanto sale de tu smart account
-          {account ? ` (${account.address.slice(0, 6)}…${account.address.slice(-4)})` : ""}{" "}
+          El pago sale de tu smart account
+          {account
+            ? ` (${account.address.slice(0, 6)}…${account.address.slice(-4)})`
+            : ""}{" "}
           y queda custodiado en el contrato EscrowPanales de Avalanche.
         </p>
 
@@ -133,7 +159,7 @@ export default function ReserveCellsModal({
             className="text-xs font-semibold text-brown bg-honey-light rounded-lg px-3 py-2"
             role="alert"
           >
-            No tienes suficientes USDC. Fondea tu billetera o reserva menos
+            No tienes suficientes USDC. Fondea tu billetera o elige menos
             celdas.
           </p>
         )}
@@ -155,7 +181,7 @@ export default function ReserveCellsModal({
           >
             {loading
               ? "Pagando en Avalanche..."
-              : `${confirmLabel} · ${formatUsdc(advance)} USDC`}
+              : `${confirmLabel} · ${formatUsdc(payNow)} USDC`}
           </Button>
           <Button
             type="button"

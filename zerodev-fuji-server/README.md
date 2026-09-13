@@ -98,11 +98,22 @@ Todos requieren `Authorization: Bearer <firebase-id-token>` salvo los marcados c
 | POST | `/api/products` | wholesaler, admin | `multipart/form-data`: `photo`, `description`, `link`, `minQuantity`, `unitPrice` |
 | PUT | `/api/products/:id` | dueño o admin | Mismos campos, todos opcionales |
 | DELETE | `/api/products/:id` | dueño o admin | 204 |
-| GET | `/api/panales/config` | cualquiera | `{ advancePercent, contractAddress }` (adelanto leído de `PORCENTAJE_ADELANTO`) |
-| GET | `/api/panales` | cualquiera | `{ items }` con `members` y `currentUnits`. Con `?mine=1` solo donde el usuario participa |
+| GET | `/api/panales/config` | cualquiera | `{ advancePercent, contractAddress, exakeyContract, collectionHours, defaultProfitPercent }` |
+| GET | `/api/panales` | cualquiera | `{ items }` con `stage`, `members`, `currentUnits`, `paidUnits`, `finalUnitPrice`, `quote`, `collectionEndsAt`, `tokenId`. Con `?mine=1` solo donde el usuario participa |
 | GET | `/api/panales/:id` | cualquiera | `{ item }` con `onchain` leído de `panales(panalId)` en EscrowPanales |
-| POST | `/api/panales` | cualquiera | `multipart/form-data`: `photo?`, `type`, `description`, `link`, `minQuantity`, `targetUnits?`, `unitPrice`, `deadline` (YYYY-MM-DD), `units`. Verifica el saldo USDC del fundador y su smart account manda una UserOp patrocinada por el paymaster de ZeroDev: `approve` del adelanto (40% de `units`) + `crearPanal(panalId, precio, minimo, objetivo, finReservas, unidadesCreador)` en `CONTRATO_AVALANCH`. Solo si se confirma se guarda `panales/{panalId}` |
-| POST | `/api/panales/:id/join` | cualquiera | `{ units }`. Paga el adelanto con `approve` + `unirseAlPanal` y agrega la Abeja a `members` |
+| POST | `/api/panales` | cualquiera | `multipart/form-data`: `photo?`, `type`, `description`, `link`, `minQuantity`, `targetUnits?`, `unitPrice`, `deadline` (YYYY-MM-DD), `units`. UserOp de la smart account (paymaster ZeroDev): `approve` del adelanto (40% de `units`) + `crearPanal(panalId, precio, minimo, objetivo, finReservas, unidadesCreador)` |
+| POST | `/api/panales/:id/join` | cualquiera | `{ units }`. Reservando: `approve` + `unirseAlPanal` (adelanto). Cobrando: `approve` + `unirseAlPanalConPagoCompleto` (total al precio final) |
+| POST | `/api/panales/:id/aumentar` | miembro | `{ units }` extra. El contrato no deja reservar dos veces, así que va en una UserOp atómica: `salirDelPanal` + `approve` + volver a entrar con el total (adelanto en reservas, pago completo en cobro) |
+| POST | `/api/panales/:id/pagar-saldo` | miembro | `approve` + `pagarSaldo`: precio final × celdas − lo pagado |
+| POST | `/api/panales/:id/reembolsar` | miembro | `reembolsar`: Panal cancelado, o sellado sin haber pagado el restante |
+| POST | `/api/panales/:id/negociacion` | admin | `iniciarCotizacion` (master). Exige el mínimo reservado. Se dispara solo cuando el Panal llena su objetivo |
+| POST | `/api/panales/:id/cotizacion/estimar` | admin | `{ precioProveedorUnidad, envioTotal, otrosCostos, gananciaPorcentaje }` → `{ quote }` con desglose por celda y por Abeja. No toca la cadena |
+| POST | `/api/panales/:id/cotizacion` | admin | Mismo body. `abrirRecoleccion(precioFinal, ahora + PANAL_COBRO_HORAS)` (master): empieza el cobro del restante |
+| POST | `/api/panales/:id/extender` | admin | `{ hours }`. `extenderPlazo` si el cobro venció sin el mínimo pagado |
+| POST | `/api/panales/:id/sellar` | admin | Tras vencer el cobro con el mínimo pagado: `liberarFondos` + `sellarPanal` (Fuji) + `crearExaKeys` (HashKey) + documentos en `exakeys`. Idempotente; el scheduler lo hace solo |
+| POST | `/api/panales/:id/cancelar` | admin | `cancelarPanal`; cada Abeja recupera lo pagado con `/reembolsar` |
+| POST | `/api/panales/:id/sync` | admin | Relee la cadena y actualiza Firestore |
+| GET | `/api/exakeys` | cualquiera | `{ items }` ExaKeys del usuario (una por unidad). Admin: `?all=1` o `?panalId=` |
 
 El rol sale del custom claim `role`; si no existe se lee de `users/{uid}.role` (por defecto `buyer`).
 En estas rutas el campo `error` es un mensaje legible para el usuario y `code` el código de máquina.
@@ -152,6 +163,35 @@ así que un cambio en `.env` no se recoge solo.
 Si el bucket no existe la subida falla y la foto cae a un data URI inline en Firestore, con tope de ~700 KB
 (Firestore limita el documento a 1 MiB). Hoy el proyecto `panalium-b5fb0` **no tiene Storage habilitado**,
 así que se está usando el modo inline; al activarlo en la consola el código lo empieza a usar sin cambios.
+
+### Ciclo de vida del Panal
+
+Etapas del contrato EscrowPanales (verificadas contra el contrato desplegado) y su nombre en Firestore (`stage`):
+
+| # | Etapa | Qué pasa |
+|---|---|---|
+| 0 | `reservando` | Las Abejas reservan pagando el 40%. Al llenar el objetivo se inicia la negociación sola |
+| 1 | `negociando` | Se habla con el proveedor; nadie más entra. El admin calcula el precio real: `(proveedor × celdas + envío + otros) × (1 + comisión%) / celdas` |
+| 2 | `cobrando` | `abrirRecoleccion` con el precio final: `PANAL_COBRO_HORAS` (48 h) para pagar el restante. Nuevas Abejas entran pagando el total |
+| 3 | `liberado` | Venció el cobro con el mínimo pagado: `liberarFondos` manda los USDC a la tesorería (master) |
+| 4 | `sellado` | `sellarPanal` + `crearExaKeys(tokenId, unidadesPagadas)` en HashKey. Quien no pagó el restante recupera su adelanto |
+| 5 | `cancelado` | Todos recuperan lo pagado |
+
+El contrato no permite sellar ni liberar antes de que venza el plazo de cobro, aunque todos hayan pagado. El scheduler
+(`PANAL_SCHEDULER_SEGUNDOS`, 60 s) sella y emite las ExaKeys de los Panales vencidos con el mínimo pagado.
+
+Las ExaKeys (ERC-1155 en HashKey Chain Testnet, `CONTRATO_HSK`) se acuñan todas a la wallet master, que queda como
+custodio. La propiedad de cada unidad vive en Firestore.
+
+Colecciones de Firestore:
+
+| Colección | Contenido |
+|---|---|
+| `panales/{panalId}` | Panal: `stage`, `members` (celdas, pagado, `paidComplete`), `quote`, `collectionEndsAt`, `txs`, `tokenId`, `exakeys` |
+| `panales/{panalId}/cotizaciones` | Historial de cotizaciones (`estimada` / `aplicada`) con el desglose por Abeja |
+| `pagos` | Cada movimiento de USDC: `adelanto`, `pago_completo`, `aumento`, `saldo`, `reembolso` |
+| `exakeys/{tokenId}-{serial}` | Una ExaKey por unidad de producto, con `ownerUid`, `ownerWallet`, `custodian` y la tx de acuñación |
+| `counters/exakeys` | Siguiente `tokenId` de ExaKey1155 |
 
 ### Smart accounts
 
@@ -220,6 +260,12 @@ const res = await fetch(`${API_URL}/api/tx/native`, {
 `getIdToken()` ya maneja el refresh; llámalo antes de cada request en vez de cachearlo tú.
 
 ## Problemas comunes
+
+**Los pagos se quedan esperando ("Pagando en Avalanche...").** El RPC público `api.avax-test.network` corta con
+`429` (Cloudflare 1015) y un `Retry-After` de ~30 minutos cuando recibe muchas lecturas desde la misma IP (por
+ejemplo un fork de Hardhat). viem respetaría ese tiempo, así que el transporte de Fuji no reintenta por RPC y
+salta a los de `AVALANCHE_RPC_FALLBACKS` (por defecto `publicnode`). Comprueba con
+`curl -i -X POST -H 'content-type: application/json' --data '{"jsonrpc":"2.0","id":1,"method":"eth_blockNumber","params":[]}' https://api.avax-test.network/ext/bc/C/rpc`.
 
 **`EADDRINUSE: address already in use :::4000`.** Quedó otra instancia viva. En Windows, cerrar la
 terminal o reiniciar el watcher deja al proceso hijo reteniendo el puerto. `npm run dev` ya libera el

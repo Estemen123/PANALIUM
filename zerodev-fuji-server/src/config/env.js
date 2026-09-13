@@ -19,6 +19,9 @@ const schema = z.object({
 
   CHAIN_ID: z.coerce.number().default(43113),
   AVALANCHE_RPC_URL: z.string().url().default('https://api.avax-test.network/ext/bc/C/rpc'),
+  // RPCs de respaldo separados por coma. El publico de Avalanche corta con 429 (Cloudflare 1015)
+  // cuando hay muchas lecturas; si falla o tarda, viem pasa al siguiente.
+  AVALANCHE_RPC_FALLBACKS: z.string().default('https://avalanche-fuji-c-chain-rpc.publicnode.com'),
 
   // Token ERC-20 que la app usa como moneda (USDC). Si se deja vacio, el fondeo desde una
   // wallet externa se hace en AVAX nativo, que es lo unico que existe por defecto en Fuji.
@@ -56,6 +59,19 @@ const schema = z.object({
     .optional()
     .or(z.literal('').transform(() => undefined)),
   CONTRATO_AVALANCH: evmAddress('CONTRATO_AVALANCH'),
+
+  // ---------- ExaKey1155 (recibos NFT) en HashKey Chain Testnet ----------
+  // Los tokens se acunan a la wallet master (custodio); la propiedad de cada unidad vive en Firestore.
+  CONTRATO_HSK: evmAddress('CONTRATO_HSK'),
+  HSK_RPC_URL: z.string().url().default('https://testnet.hsk.xyz'),
+
+  // ---------- Ciclo de vida del Panal ----------
+  // Horas que tienen las Abejas para pagar el restante una vez abierta la recoleccion.
+  PANAL_COBRO_HORAS: z.coerce.number().positive().default(48),
+  // Porcentaje de ganancia sugerido en la cotizacion (el admin puede cambiarlo).
+  PANAL_GANANCIA_PORCENTAJE: z.coerce.number().min(0).max(1000).default(10),
+  // Cada cuanto el servidor revisa Panales con el cobro vencido para sellarlos (0 = desactivado).
+  PANAL_SCHEDULER_SEGUNDOS: z.coerce.number().int().min(0).default(60),
 
   KEY_ENCRYPTION_MASTER_KEY: z
     .string()
