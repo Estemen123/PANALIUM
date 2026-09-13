@@ -10,6 +10,7 @@ export {
   GroupStatusBadge,
 } from "./components/GroupStatusBadges"
 export { default as PanalAdminModal } from "./components/PanalAdminModal"
+export { loadPanalesFromBackend } from "./api"
 export {
   useGroups,
   useMyGroups,

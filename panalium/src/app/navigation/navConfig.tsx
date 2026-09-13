@@ -30,6 +30,7 @@ const WHOLESALER_NAV: NavItem[] = [
 
 const ADMIN_NAV: NavItem[] = [
   { id: "admin-overview", label: "Resumen de la colmena" },
+  { id: "admin-escrow", label: "Contrato Escrow" },
   { id: "admin-users", label: "Abejas" },
   { id: "marketplace-products", label: "Catálogo" },
   { id: "marketplace-groups", label: "Panales" },

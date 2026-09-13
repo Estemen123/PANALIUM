@@ -4,7 +4,7 @@ import { parseUnits } from 'viem';
 import { z } from 'zod';
 import { db, FieldValue } from '../config/firebase.js';
 import { env } from '../config/env.js';
-import { requireAuth, requireRole } from '../middleware/auth.js';
+import { rejectAdmin, requireAuth, requireRole } from '../middleware/auth.js';
 import { HttpError, asyncHandler } from '../middleware/errors.js';
 import {
   aumentarParticipacion,
@@ -248,6 +248,7 @@ router.get(
 /** POST /api/panales — crea el Panal en el contrato, cobra el adelanto al fundador y lo guarda */
 router.post(
   '/',
+  rejectAdmin,
   writeLimiter,
   imageUpload.single('photo'),
   asyncHandler(async (req, res) => {
@@ -318,6 +319,7 @@ router.post(
 /** Ejecuta una accion de la Abeja, la registra en `pagos` y resincroniza el Panal. */
 function abejaAction(handler) {
   return [
+    rejectAdmin,
     writeLimiter,
     asyncHandler(async (req, res) => {
       const { uid } = req.user;

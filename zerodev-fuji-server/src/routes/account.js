@@ -13,7 +13,8 @@ router.use(requireAuth);
 
 /**
  * GET /api/account/me
- * Devuelve (y crea si no existia) la smart account del usuario autenticado.
+ * Devuelve (y crea si no existia) la wallet del usuario autenticado: su smart account, o la
+ * wallet master si es admin (`kind` dice cual).
  * La direccion es contrafactual: existe aunque el contrato aun no este desplegado.
  */
 router.get(

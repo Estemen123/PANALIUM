@@ -1,11 +1,22 @@
 import { encodeFunctionData, erc20Abi, formatEther, formatUnits, parseEther, parseUnits } from 'viem';
-import { publicClient, explorerTxUrl } from '../config/chain.js';
+import { publicClient, explorerTxUrl, fujiTransport } from '../config/chain.js';
+import { isAdminUid } from '../middleware/auth.js';
+import { getMasterAddress, sendCallsAsMaster } from './masterWallet.js';
 import { getKernelClient, withAccountLock } from './smartAccount.js';
 
-/** Info general de la smart account del usuario. */
-export async function getAccountInfo(uid) {
+/**
+ * Wallet con la que opera el usuario: el admin usa la wallet master (EOA, paga su gas);
+ * el resto, su smart account de ZeroDev (UserOps patrocinadas).
+ */
+export async function resolveUserWallet(uid) {
+  if (await isAdminUid(uid)) return { kind: 'master', address: getMasterAddress() };
   const client = await getKernelClient(uid);
-  const address = client.account.address;
+  return { kind: 'smart', address: client.account.address };
+}
+
+/** Info general de la wallet del usuario. */
+export async function getAccountInfo(uid) {
+  const { kind, address } = await resolveUserWallet(uid);
 
   const [balance, bytecode] = await Promise.all([
     publicClient.getBalance({ address }),
@@ -13,16 +24,17 @@ export async function getAccountInfo(uid) {
   ]);
 
   return {
+    kind,
     address,
-    deployed: Boolean(bytecode && bytecode !== '0x'),
+    // Una EOA no tiene bytecode: para la master "desplegada" siempre es verdadero.
+    deployed: kind === 'master' || Boolean(bytecode && bytecode !== '0x'),
     balance: { wei: balance.toString(), avax: formatEther(balance) },
   };
 }
 
 /** Balance y metadata de un token ERC-20. */
 export async function getTokenBalance(uid, token) {
-  const client = await getKernelClient(uid);
-  const address = client.account.address;
+  const { address } = await resolveUserWallet(uid);
 
   const [balance, decimals, symbol] = await Promise.all([
     publicClient.readContract({ address: token, abi: erc20Abi, functionName: 'balanceOf', args: [address] }),
@@ -44,6 +56,9 @@ export async function getTokenBalance(uid, token) {
  * calls: [{ to, value?: bigint, data?: '0x...' }]
  */
 async function sendCalls(uid, calls, { waitForReceipt = true } = {}) {
+  if (await isAdminUid(uid)) {
+    return sendCallsAsMaster({ client: publicClient, transport: fujiTransport, explorerTxUrl, calls, waitForReceipt });
+  }
   return withAccountLock(uid, async () => {
     const client = await getKernelClient(uid);
 
@@ -113,6 +128,17 @@ export async function sendBatch(uid, { calls, waitForReceipt }) {
 
 /** Estado de una UserOp ya enviada. */
 export async function getUserOperationStatus(uid, userOpHash) {
+  if (await isAdminUid(uid)) {
+    // La master no manda UserOps: el "hash" es el de la transaccion.
+    const receipt = await publicClient.getTransactionReceipt({ hash: userOpHash }).catch(() => null);
+    if (!receipt) return { userOpHash, status: 'pending' };
+    return {
+      userOpHash,
+      status: receipt.status === 'success' ? 'success' : 'reverted',
+      transactionHash: receipt.transactionHash,
+      explorerUrl: explorerTxUrl(receipt.transactionHash),
+    };
+  }
   const client = await getKernelClient(uid);
   try {
     const receipt = await client.getUserOperationReceipt({ hash: userOpHash });

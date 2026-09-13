@@ -32,6 +32,8 @@ export interface AccountBalance {
 /** Smart account del usuario, tal como la devuelve `GET /api/account/me`. */
 export interface SmartAccount {
   uid: string
+  /** `master`: el admin opera con la wallet master (EOA) en vez de una smart account. */
+  kind?: "smart" | "master"
   address: string
   deployed: boolean
   balance: AccountBalance

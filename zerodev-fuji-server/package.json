@@ -10,6 +10,7 @@
     "dev": "node scripts/freePort.mjs && node --watch-path=./src --watch-preserve-output src/server.js",
     "user:check": "node scripts/checkUser.mjs",
     "user:role": "node scripts/setRole.mjs",
+    "user:admin": "node scripts/createAdmin.mjs",
     "port:free": "node scripts/freePort.mjs",
     "wallets:backfill": "node scripts/backfillWallets.mjs"
   },

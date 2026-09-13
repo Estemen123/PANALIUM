@@ -4,8 +4,24 @@
     {
       "name": "api",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "zerodev-fuji-server", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "zerodev-fuji-server",
+        "run",
+        "dev"
+      ],
       "port": 4000
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "panalium",
+        "run",
+        "dev"
+      ],
+      "port": 8443
     }
   ]
 }

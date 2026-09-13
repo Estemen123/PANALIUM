@@ -10,6 +10,7 @@ import exakeysRoutes from './routes/exakeys.js';
 import configRoutes from './routes/config.js';
 import accountRoutes from './routes/account.js';
 import txRoutes from './routes/tx.js';
+import adminEscrowRoutes from './routes/adminEscrow.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 
 export function createApp() {
@@ -40,6 +41,8 @@ export function createApp() {
   app.use('/api/products', productsRoutes);
   app.use('/api/panales', panalesRoutes);
   app.use('/api/exakeys', exakeysRoutes);
+  // Consola del owner de EscrowPanales (solo admin)
+  app.use('/api/admin/escrow', adminEscrowRoutes);
 
   // Smart accounts (ZeroDev / Avalanche Fuji)
   app.use('/api/account', accountRoutes);

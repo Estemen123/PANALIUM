@@ -46,6 +46,29 @@ export async function resolveRole(user) {
   return ROLES.includes(role) ? role : 'buyer';
 }
 
+/** Rol de un uid sin token (servicios): claim de Auth -> users/{uid}.role -> 'buyer'. */
+export async function roleOfUid(uid) {
+  const record = await auth.getUser(uid).catch(() => null);
+  const claim = record?.customClaims?.role;
+  return resolveRole({ uid, role: ROLES.includes(claim) ? claim : undefined });
+}
+
+/** El administrador opera con la wallet master, no con una smart account. */
+export const isAdminUid = async (uid) => (await roleOfUid(uid)) === 'admin';
+
+/** Rechaza al admin en rutas que necesitan smart account (participar en Panales como Abeja). */
+export async function rejectAdmin(req, res, next) {
+  try {
+    if ((await resolveRole(req.user)) !== 'admin') return next();
+    return res.status(403).json({
+      error: 'El administrador opera con la wallet master y no participa en Panales como Abeja',
+      code: 'admin_master_wallet',
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /** Exige uno de los roles indicados. Debe ir despues de requireAuth. */
 export function requireRole(...roles) {
   return async (req, res, next) => {

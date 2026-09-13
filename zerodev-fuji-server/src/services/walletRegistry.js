@@ -1,5 +1,7 @@
 import { db, FieldValue } from '../config/firebase.js';
 import { chain } from '../config/chain.js';
+import { isAdminUid } from '../middleware/auth.js';
+import { getMasterAddress } from './masterWallet.js';
 import { getSmartAccountAddress } from './smartAccount.js';
 
 /**
@@ -21,6 +23,7 @@ function serializeWallet(id, data) {
     idwallet: String(data.idwallet ?? ''),
     createdBy: String(data.createdBy ?? ''),
     chainId: data.chainId ?? chain.id,
+    kind: data.kind === 'master' ? 'master' : 'smart',
   };
 }
 
@@ -40,6 +43,8 @@ export async function findWallet(uid) {
  * Devuelve `{ ...wallet, created }`, donde `created` dice si se escribio en esta llamada.
  */
 export async function ensureWallet(uid) {
+  if (await isAdminUid(uid)) return ensureMasterWallet(uid);
+
   // 1. Camino rapido: ya registrada y con direccion. Evita el RPC y la transaccion.
   const existing = await findWallet(uid);
   if (existing?.idwallet) return { ...existing, created: false };
@@ -76,6 +81,40 @@ export async function ensureWallet(uid) {
   });
 
   return result;
+}
+
+/**
+ * El admin no tiene smart account: su documento en `wallet` apunta a la wallet master.
+ * Si antes se le habia registrado una smart account, la direccion vieja queda en `previousIdwallet`.
+ */
+async function ensureMasterWallet(uid) {
+  const address = getMasterAddress();
+  const snap = await db.collection(COLLECTION).where('createdBy', '==', uid).limit(1).get();
+
+  if (!snap.empty) {
+    const doc = snap.docs[0];
+    const data = doc.data() ?? {};
+    if (String(data.idwallet).toLowerCase() === address.toLowerCase() && data.kind === 'master') {
+      return { ...serializeWallet(doc.id, data), created: false };
+    }
+    const update = { idwallet: address, kind: 'master', chainId: chain.id, updatedAt: FieldValue.serverTimestamp() };
+    if (data.idwallet && String(data.idwallet).toLowerCase() !== address.toLowerCase()) {
+      update.previousIdwallet = data.idwallet;
+    }
+    await doc.ref.update(update);
+    return { id: doc.id, idwallet: address, createdBy: uid, chainId: chain.id, kind: 'master', created: true };
+  }
+
+  const ref = db.collection(COLLECTION).doc();
+  await ref.set({
+    idwallet: address,
+    kind: 'master',
+    createdBy: uid,
+    chainId: chain.id,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: null,
+  });
+  return { id: ref.id, idwallet: address, createdBy: uid, chainId: chain.id, kind: 'master', created: true };
 }
 
 /**

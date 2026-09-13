@@ -15,7 +15,7 @@ import {
 } from "@/features/groups"
 import { MyReceiptsPage } from "@/features/receipts"
 import { NFTMarketplacePage } from "@/features/nft-market"
-import { AdminOverviewPage, AdminUsersPage } from "@/features/admin"
+import { AdminEscrowPage, AdminOverviewPage, AdminUsersPage } from "@/features/admin"
 
 /**
  * View to page registry. Adding a screen = add a `View` in `app/navigation/types.ts`,
@@ -33,6 +33,7 @@ export const ROUTES: Record<View, ComponentType> = {
   "wholesaler-add-product": AddProductPage,
   "admin-overview": AdminOverviewPage,
   "admin-users": AdminUsersPage,
+  "admin-escrow": AdminEscrowPage,
   "my-receipts": MyReceiptsPage,
   "nft-marketplace": NFTMarketplacePage,
 }

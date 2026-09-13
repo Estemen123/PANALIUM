@@ -332,3 +332,42 @@ export const extenderPlazo = (panalId, nuevoFin) => master('extenderPlazo', [pan
 export const liberarFondos = (panalId) => master('liberarFondos', [panalId]);
 export const sellarPanal = (panalId) => master('sellarPanal', [panalId]);
 export const cancelarPanal = (panalId) => master('cancelarPanal', [panalId]);
+export const transferirPropiedad = (nuevoOwner) => master('transferOwnership', [nuevoOwner]);
+
+/* ── Estado global del contrato (consola del admin) ───────────────────── */
+
+/**
+ * owner, tesoreria, token de cobro, porcentaje de adelanto y saldos. Cada lectura es independiente:
+ * si una falla (ABI desincronizado, RPC) vuelve null en vez de tumbar la pantalla completa.
+ */
+export async function leerContrato() {
+  assertConfigured();
+  const safe = (p) => p.catch(() => null);
+  const masterAddress = env.WALLET_MASTER ?? null;
+  const [owner, tesoreria, usdc, direccionUsdc, numerador, base, saldoEscrow, avaxMaster, block] = await Promise.all([
+    safe(read('owner')),
+    safe(read('tesoreria')),
+    safe(read('usdc')),
+    safe(read('DIRECCION_USDC')),
+    safe(read('PORCENTAJE_ADELANTO')),
+    safe(read('BASE_PORCENTAJES')),
+    safe(saldoUsdc(env.CONTRATO_AVALANCH)),
+    masterAddress ? safe(publicClient.getBalance({ address: masterAddress })) : null,
+    safe(publicClient.getBlock()),
+  ]);
+  const saldoTesoreria = tesoreria ? await safe(saldoUsdc(tesoreria)) : null;
+  return {
+    address: env.CONTRATO_AVALANCH,
+    chainId: publicClient.chain.id,
+    owner,
+    tesoreria,
+    usdc: usdc ?? direccionUsdc,
+    masterAddress,
+    masterEsOwner: Boolean(owner && masterAddress && owner.toLowerCase() === masterAddress.toLowerCase()),
+    advancePercent: numerador != null && base ? (Number(numerador) * 100) / Number(base) : null,
+    saldoEscrowUsdc: saldoEscrow == null ? null : toUsdc(saldoEscrow),
+    saldoTesoreriaUsdc: saldoTesoreria == null ? null : toUsdc(saldoTesoreria),
+    avaxMaster: avaxMaster == null ? null : Number(formatUnits(avaxMaster, 18)),
+    blockTimestamp: block ? Number(block.timestamp) : null,
+  };
+}
